@@ -13,6 +13,9 @@ namespace Miniblog.Core.Services
 
         Task<IEnumerable<Post>> GetPostsByCategory(string category);
 
+        Task<IEnumerable<IGrouping<string, PostGroupCatsViewModel>>> GetPostsGroupbyCategory(string category);
+
+
         Task<IEnumerable<Post>> GetPostsByCat(string book);
 
         Task<Post> GetPostBySlug(string slug);
@@ -48,6 +51,24 @@ namespace Miniblog.Core.Services
                 .Take(count);
 
             return Task.FromResult(posts);
+        }
+
+
+        public virtual Task<IEnumerable<IGrouping<string, PostGroupCatsViewModel>>> GetPostsGroupbyCategory(string category)
+        {
+            bool isAdmin = IsAdmin();
+
+            var posts = Cache
+                .Where(p => p.IsPublished || isAdmin)
+                .SelectMany(post => post.Categories)
+                .Select(cat => cat.ToLowerInvariant())
+            //.GroupBy(g => g.Categories.)
+            ;
+
+            //var postsGroup = _cache.
+
+            //return Task.FromResult(posts);
+            return null;
         }
 
         public virtual Task<IEnumerable<Post>> GetPostsByCategory(string category)
@@ -87,6 +108,8 @@ namespace Miniblog.Core.Services
 
             return Task.FromResult(posts);
         }
+
+
 
         public virtual Task<Post> GetPostById(string id)
         {

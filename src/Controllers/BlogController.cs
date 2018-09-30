@@ -30,6 +30,8 @@ namespace Miniblog.Core.Controllers
         public async Task<IActionResult> Index([FromRoute]int page = 0)
         {
             ViewData["AllCats"] = (await _blog.GetCategories()).ToList();
+            ViewData["SidebarList"] = (await _blog.GetPostsGroupbyCategory(null)).ToList();
+            ViewData["MenuTitle"] = $"目錄";
 
             var posts = await _blog.GetPosts(_settings.Value.PostsPerPage, _settings.Value.PostsPerPage * page);
             ViewData["Title"] = _manifest.Name;
@@ -45,6 +47,8 @@ namespace Miniblog.Core.Controllers
         {
             ViewData["AllCats"] = (await _blog.GetCategories()).ToList();
             ViewData["selectcategory"] = category;
+            ViewData["SidebarList"] = (await _blog.GetPostsGroupbyCategory(category)).ToList();
+            ViewData["MenuTitle"] = $"目錄";
 
             var posts = (await _blog.GetPostsByCategory(category)).Skip(_settings.Value.PostsPerPage * page).Take(_settings.Value.PostsPerPage);
             ViewData["Title"] = _manifest.Name + " " + category;

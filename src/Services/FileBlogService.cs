@@ -55,6 +55,22 @@ namespace Miniblog.Core.Services
             return Task.FromResult(posts);
         }
 
+        public virtual Task<IEnumerable<IGrouping<string, PostGroupCatsViewModel>>> GetPostsGroupbyCategory(string category)
+        {
+            bool isAdmin = IsAdmin();
+            var postsGroup = _cache
+                .Where(w=> category==null?true:w.Categories.Contains(category))
+                .SelectMany(cat => cat.Categories,
+                    (post, cat) => new PostGroupCatsViewModel
+                    {
+                        Title = post.Title,
+                        Slug = post.Slug,
+                        CatName = cat.ToLowerInvariant()
+                    }
+                ).GroupBy(g=>g.CatName);
+            return Task.FromResult(postsGroup);
+        }
+
         public virtual Task<Post> GetPostBySlug(string slug)
         {
             var post = _cache.FirstOrDefault(p => p.Slug.Equals(slug, StringComparison.OrdinalIgnoreCase));
@@ -208,7 +224,9 @@ namespace Miniblog.Core.Services
         private void LoadPosts()
         {
             if (!Directory.Exists(_folder))
+            {
                 Directory.CreateDirectory(_folder);
+            }
 
             // Can this be done in parallel to speed it up?
             foreach (string file in Directory.EnumerateFiles(_folder, "*.xml", SearchOption.TopDirectoryOnly))
@@ -237,7 +255,9 @@ namespace Miniblog.Core.Services
         {
             XElement categories = doc.Element("categories");
             if (categories == null)
+            {
                 return;
+            }
 
             List<string> list = new List<string>();
 
@@ -254,7 +274,9 @@ namespace Miniblog.Core.Services
             var comments = doc.Element("comments");
 
             if (comments == null)
+            {
                 return;
+            }
 
             foreach (var node in comments.Elements("comment"))
             {
@@ -275,7 +297,9 @@ namespace Miniblog.Core.Services
         private static string ReadValue(XElement doc, XName name, string defaultValue = "")
         {
             if (doc.Element(name) != null)
+            {
                 return doc.Element(name)?.Value;
+            }
 
             return defaultValue;
         }
@@ -283,7 +307,9 @@ namespace Miniblog.Core.Services
         private static string ReadAttribute(XElement element, XName name, string defaultValue = "")
         {
             if (element.Attribute(name) != null)
+            {
                 return element.Attribute(name)?.Value;
+            }
 
             return defaultValue;
         }
