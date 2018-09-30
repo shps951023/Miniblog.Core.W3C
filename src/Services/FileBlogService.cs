@@ -68,6 +68,18 @@ namespace Miniblog.Core.Services
             return Task.FromResult<Post>(null);
         }
 
+        public virtual Task<IEnumerable<Post>> GetPostsByCat(string cat)
+        {
+            bool isAdmin = IsAdmin();
+
+            var posts = from p in _cache
+                        where p.PubDate <= DateTime.Now && (p.IsPublished || isAdmin)
+                        where p.Categories.Contains(cat.ToLowerInvariant())
+                        select p;
+
+            return Task.FromResult(posts);
+        }
+
         public virtual Task<Post> GetPostById(string id)
         {
             var post = _cache.FirstOrDefault(p => p.ID.Equals(id, StringComparison.OrdinalIgnoreCase));

@@ -29,6 +29,8 @@ namespace Miniblog.Core.Controllers
         [OutputCache(Profile = "default")]
         public async Task<IActionResult> Index([FromRoute]int page = 0)
         {
+            ViewData["AllCats"] = (await _blog.GetCategories()).ToList();
+
             var posts = await _blog.GetPosts(_settings.Value.PostsPerPage, _settings.Value.PostsPerPage * page);
             ViewData["Title"] = _manifest.Name;
             ViewData["Description"] = _manifest.Description;
@@ -41,6 +43,9 @@ namespace Miniblog.Core.Controllers
         [OutputCache(Profile = "default")]
         public async Task<IActionResult> Category(string category, int page = 0)
         {
+            ViewData["AllCats"] = (await _blog.GetCategories()).ToList();
+            ViewData["selectcategory"] = category;
+
             var posts = (await _blog.GetPostsByCategory(category)).Skip(_settings.Value.PostsPerPage * page).Take(_settings.Value.PostsPerPage);
             ViewData["Title"] = _manifest.Name + " " + category;
             ViewData["Description"] = $"Articles posted in the {category} category";
@@ -63,11 +68,17 @@ namespace Miniblog.Core.Controllers
         {
             var post = await _blog.GetPostBySlug(slug);
 
+            ViewData["AllCats"] = (await _blog.GetCategories()).ToList();
+
             if (post != null)
             {
+                var cat = post.Categories.FirstOrDefault();
+                ViewData["selectcategory"] = post.Categories.FirstOrDefault();
+                ViewData["MenuTitle"] = $"目錄";
+                ViewData["SidebarList"] = (await _blog.GetPostsByCat(cat)).ToList();
+
                 return View(post);
             }
-
             return NotFound();
         }
 

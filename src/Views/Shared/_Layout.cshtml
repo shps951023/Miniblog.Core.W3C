@@ -3,10 +3,9 @@
 @{
     var host = Context.Request.Scheme + "://" + Context.Request.Host;
 
-    List<string> allBooks = ViewData["AllBooks"] as List<string> ?? new List<string>();
     List<string> allCats = ViewData["AllCats"] as List<string> ?? new List<string>();
     allCats.Sort();
-    var selectBook = ViewData["selectBook"] as string;
+    var selectcategory = ViewData["selectcategory"] as string;
 }
 <!DOCTYPE html>
 <html lang="zh-tw">
@@ -43,7 +42,6 @@
 
     <link href="~/css/w3.css" rel="stylesheet" />
 
-    @*<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css"/>*@
     <style>
         * {
             font-family: "Arial", "Microsoft YaHei", "黑体", "宋体", sans-serif;
@@ -145,14 +143,14 @@
             <a class="w3-bar-item w3-button w3-left w3-hide-large w3-hover-white w3-large w3-theme w3-padding-16 " href="javascript:void(0)"
                onclick="w3_open()">☰</a>
             <a class="w3-bar-item w3-button w3-hide-medium w3-hide-small w3-hover-white w3-padding-16
-               @(null ==selectBook?"active":"") "
+               @(null ==selectcategory?"active":"") "
                href="/">首頁</a>
-            @foreach (var item in allBooks)
+            @foreach (var item in allCats)
             {
                 <a class="w3-bar-item w3-button w3-hide-medium w3-hide-small w3-hover-white w3-padding-16
-                   @(item ==selectBook?"active":"")"
-                   asp-controller="Blog" asp-action="Book"
-                   asp-route-book="@item" asp-route-page="">@item</a>
+                   @(item ==selectcategory?"active":"")"
+                   asp-controller="Blog" asp-action="category"
+                   asp-route-category="@item" asp-route-page="">@item</a>
             }
         </div>
     </div>
@@ -160,13 +158,13 @@
     <div class="w3-sidebar w3-bar-block w3-collapse w3-animate-left" style="z-index:3;width:270px" id="mySidebar">
         @* 手機版書籍頁面 *@
         <div class="w3-bar w3-hide-large w3-large">
-            <a class="w3-bar-item w3-button w3-theme w3-hover-white w3-padding-16 @(null ==selectBook?"active":"")  "
+            <a class="w3-bar-item w3-button w3-theme w3-hover-white w3-padding-16 @(null ==selectcategory?"active":"")  "
                href="/">首頁</a>
-            @foreach (var item in allBooks)
+            @foreach (var item in allCats)
             {
-                <a class="w3-bar-item w3-button w3-theme w3-hover-white w3-padding-16 @(item ==selectBook?"active":"")"
-                   asp-controller="Blog" asp-action="Book"
-                   asp-route-book="@item" asp-route-page="">@item</a>
+                <a class="w3-bar-item w3-button w3-theme w3-hover-white w3-padding-16 @(item ==selectcategory?"active":"")"
+                   asp-controller="Blog" asp-action="category"
+                   asp-route-category="@item" asp-route-page="">@item</a>
             }
         </div>
         <a href="javascript:void(0)" onclick="w3_close()" class="w3-button w3-right w3-xlarge w3-hide-large" title="Close Menu">×</a>
@@ -195,7 +193,7 @@
                     Powered by:
                     <a href="https://github.com/shps951023/Miniblog.Core-W3C-TW">Miniblog.Core-W3C-TW</a>
                 </p>
-                <p>© @DateTime.Now.Year - ITWeiHan </p>
+                <p>© @DateTime.Now.Year - @settings.Value.Owner </p>
             </footer>
 
             <!-- END MAIN -->
