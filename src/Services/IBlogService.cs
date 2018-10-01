@@ -61,7 +61,7 @@ namespace Miniblog.Core.Services
             var posts = Cache
                 .Where(p => p.IsPublished || isAdmin)
                 .SelectMany(post => post.Categories)
-                .Select(cat => cat.ToLowerInvariant())
+                .Select(cat => cat.MiniBlogToLowerInvariant())
             //.GroupBy(g => g.Categories.)
             ;
 
@@ -103,7 +103,7 @@ namespace Miniblog.Core.Services
 
             var posts = from p in Cache
                         where p.PubDate <= DateTime.Now && (p.IsPublished || isAdmin)
-                        where p.Categories.Contains(cat.ToLowerInvariant())
+                        where p.Categories.Contains(cat.MiniBlogToLowerInvariant())
                         select p;
 
             return Task.FromResult(posts);
@@ -131,7 +131,7 @@ namespace Miniblog.Core.Services
             var categories = Cache
                 .Where(p => p.IsPublished || isAdmin)
                 .SelectMany(post => post.Categories)
-                .Select(cat => cat.ToLowerInvariant())
+                .Select(cat => cat.MiniBlogToLowerInvariant())
                 .Distinct();
 
             return Task.FromResult(categories);

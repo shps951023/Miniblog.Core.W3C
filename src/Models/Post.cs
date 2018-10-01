@@ -45,11 +45,11 @@ namespace Miniblog.Core.Models
 
         public static string CreateSlug(string title)
         {
-            title = title.ToLowerInvariant().Replace(" ", "-");
+            title = title.MiniBlogToLowerInvariant().Replace(" ", "-");
             title = RemoveDiacritics(title);
             title = RemoveReservedUrlCharacters(title);
 
-            return title.ToLowerInvariant();
+            return title.MiniBlogToLowerInvariant();
         }
 
         static string RemoveReservedUrlCharacters(string text)

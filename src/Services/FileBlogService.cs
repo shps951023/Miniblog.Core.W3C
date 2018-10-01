@@ -84,7 +84,7 @@ namespace Miniblog.Core.Services
 
             var posts = from p in _cache
                         where p.PubDate <= DateTime.Now && (p.IsPublished || isAdmin)
-                        where p.Categories.Contains(cat.ToLowerInvariant())
+                        where p.Categories.Contains(cat.MiniBlogToLowerInvariant())
                         select p;
 
             return Task.FromResult(posts);
@@ -110,7 +110,7 @@ namespace Miniblog.Core.Services
             var categories = _cache
                 .Where(p => p.IsPublished || isAdmin)
                 .SelectMany(post => post.Categories)
-                .Select(cat => cat.ToLowerInvariant())
+                .Select(cat => cat.MiniBlogToLowerInvariant())
                 .Distinct();
 
             return Task.FromResult(categories);
@@ -232,7 +232,7 @@ namespace Miniblog.Core.Services
                 {
                     Title = post.Title,
                     Slug = post.Slug,
-                    CatName = cat.ToLowerInvariant()
+                    CatName = cat.MiniBlogToLowerInvariant()
                 }
             )
             .GroupBy(g => g.CatName).ToList().ForEach(p=>
@@ -259,9 +259,9 @@ namespace Miniblog.Core.Services
                     Title = ReadValue(doc, "title"),
                     Excerpt = ReadValue(doc, "excerpt"),
                     Content = ReadValue(doc, "content"),
-                    Slug = ReadValue(doc, "slug").ToLowerInvariant(),
-                    PubDate = DateTime.Parse(ReadValue(doc, "pubDate")).ToUniversalTime(),
-                    LastModified = DateTime.Parse(ReadValue(doc, "lastModified", DateTime.UtcNow.ToString(CultureInfo.InvariantCulture))).ToUniversalTime(),
+                    Slug = ReadValue(doc, "slug").MiniBlogToLowerInvariant(),
+                    PubDate = DateTime.Parse(ReadValue(doc, "pubDate")).MiniBlogToLowerInvariant(),
+                    LastModified = DateTime.Parse(ReadValue(doc, "lastModified", DateTime.UtcNow.ToString(CultureInfo.InvariantCulture))).MiniBlogToLowerInvariant(),
                     IsPublished = bool.Parse(ReadValue(doc, "ispublished", "true")),
                 };
 
@@ -350,7 +350,7 @@ namespace Miniblog.Core.Services
 
             return dateTime.Kind == DateTimeKind.Utc
                 ? dateTime.ToString(UTC)
-                : dateTime.ToUniversalTime().ToString(UTC);
+                : dateTime.MiniBlogToLowerInvariant().ToString(UTC);
         }
 
         protected void SortCache()

@@ -128,6 +128,9 @@ namespace Miniblog.Core
                 app.UseHttpsRedirection();
             }
 
+            //標籤、標題是否要轉小寫
+            MiniBlogStringExtensions.SetToLowerInvariant(value: Configuration.GetValue<bool>("toLowerInvariant"));
+
             app.UseMetaWeblog("/metaweblog");
             app.UseAuthentication();
 

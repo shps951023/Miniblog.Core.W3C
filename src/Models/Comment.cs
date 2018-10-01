@@ -27,7 +27,7 @@ namespace Miniblog.Core.Models
         {
             using (var md5 = System.Security.Cryptography.MD5.Create())
             {
-                byte[] inputBytes = Encoding.UTF8.GetBytes(Email.Trim().ToLowerInvariant());
+                byte[] inputBytes = Encoding.UTF8.GetBytes(Email.Trim().MiniBlogToLowerInvariant());
                 byte[] hashBytes = md5.ComputeHash(inputBytes);
 
                 // Convert the byte array to hexadecimal string
@@ -37,7 +37,7 @@ namespace Miniblog.Core.Models
                     sb.Append(hashBytes[i].ToString("X2"));
                 }
 
-                return $"https://www.gravatar.com/avatar/{sb.ToString().ToLowerInvariant()}?s=60&d=blank";
+                return $"https://www.gravatar.com/avatar/{sb.ToString().MiniBlogToLowerInvariant()}?s=60&d=blank";
             }
         }
 
