@@ -1,7 +1,7 @@
 {
-  "name": "Miniblog.Core",
-  "short_name": "Miniblog.Core",
-  "description": "A short description of the blog.",
+  "name": "Miniblog.Core-W3c",
+  "short_name": "Miniblog.Core-W3c",
+  "description": "歡迎來到Miniblog.Core-W3c",
   "icons": [
     {
       "src": "/img/icon192x192.png",

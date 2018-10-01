@@ -118,26 +118,6 @@
             <div class="w3-half w3-margin-top w3-wide w3-hide-medium w3-hide-small">
                 <div class="w3-right">
                     @manifest.Description
-
-                    @{
-                        string path = Context.Request.Path;
-
-                        if (User.Identity.IsAuthenticated)
-                        {
-                            @:【
-                            <a asp-controller="Blog" asp-action="Edit">New post</a>
-                            @:/
-                            <a href="~/logout/" title="Sign out as administrator">Sign out</a>
-                            @:】
-                        }
-                        else
-                        {
-                            if (settings.Value.ShowLogin)
-                            {
-                                <a href="~/login/?returnUrl=@path" rel="nofollow" title="Sign in as administrator">Sign in</a>
-                            }
-                        }
-                    }
                 </div>
             </div>
         </div>
@@ -192,6 +172,25 @@
 
             @RenderBody()
             <footer class="w3-panel w3-padding-32 w3-card-4 w3-light-grey w3-center w3-opacity">
+                @{
+                    string path = Context.Request.Path;
+
+                    if (User.Identity.IsAuthenticated)
+                    {
+                        @:【
+                        <a asp-controller="Blog" asp-action="Edit">新建文章</a>
+                        @:/
+                        <a href="~/logout/" title="Sign out as administrator">登出</a>
+                        @:】
+                    }
+                    else
+                    {
+                        if (settings.Value.ShowLogin)
+                        {
+                        <a href="~/login/?returnUrl=@path" rel="nofollow" title="Sign in as administrator">【登入】</a>
+                        }
+                    }
+                }
                 <p>
                     Powered by:
                     <a href="https://github.com/shps951023/W3CMiniblog.Core-Theme-W3C">W3CMiniblog.Core-Theme-W3C</a>
