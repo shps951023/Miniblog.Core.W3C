@@ -163,8 +163,8 @@ namespace Miniblog.Core.Services
             {
                 _cache.Add(post);
                 SortCache();
-                LoadPostGroupByCat();
             }
+            ReloadCacheData();
         }
 
         public Task DeletePost(Post post)
@@ -179,8 +179,8 @@ namespace Miniblog.Core.Services
             if (_cache.Contains(post))
             {
                 _cache.Remove(post);
-                LoadPostGroupByCat();
             }
+            ReloadCacheData();
 
             return Task.CompletedTask;
         }
