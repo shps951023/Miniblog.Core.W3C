@@ -1,15 +1,18 @@
 ﻿## 獻給第10屆鐵人賽，Miniblog.Core❤️W3C專案
 
 使用MiniBlog的NETCore技術加上W3C介面來整理IT鐵人賽的文章
-歡迎IT人使用、回饋。
-因為剛接觸NETCore，有不正確的地方麻煩告知，我會盡快修正。
-Github連結:[W3CMiniblog.Core-Theme-W3C](https://github.com/shps951023/W3CMiniblog.Core-Theme-W3C)
 
+因為剛接觸NETCore，有不正確的地方麻煩告知，我會盡快修正。
+
+Github連結:[W3CMiniblog.Core-Theme-W3C](https://github.com/shps951023/W3CMiniblog.Core-Theme-W3C)
+![](https://i.imgur.com/LIUFX8Y.png)
 
 ---
 
 Live demo: https://miniblogcorew3c.azurewebsites.net
+
 帳號: demo
+
 密碼: demo
 
 ---
@@ -34,7 +37,6 @@ Live demo: https://miniblogcorew3c.azurewebsites.net
 ---
 
 ## 手冊連結(完善中):https://itweihan.azurewebsites.net/
-
 
 ## 使用手冊
 - [如何支援SQL-Server]
