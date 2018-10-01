@@ -7,7 +7,7 @@ using AngleSharp.Parser.Html;
 
 namespace Miniblog.Core.Helper
 {
-    public class HtmlConvertHelper
+    public class HtmlHelper
     {
         public static string HtmlInnerText(string content)
         {
