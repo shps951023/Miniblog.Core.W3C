@@ -260,8 +260,8 @@ namespace Miniblog.Core.Services
                     Excerpt = ReadValue(doc, "excerpt"),
                     Content = ReadValue(doc, "content"),
                     Slug = ReadValue(doc, "slug").MiniBlogToLowerInvariant(),
-                    PubDate = DateTime.Parse(ReadValue(doc, "pubDate")).MiniBlogToLowerInvariant(),
-                    LastModified = DateTime.Parse(ReadValue(doc, "lastModified", DateTime.UtcNow.ToString(CultureInfo.InvariantCulture))).MiniBlogToLowerInvariant(),
+                    PubDate = DateTime.Parse(ReadValue(doc, "pubDate")).ToUniversalTime(),
+                    LastModified = DateTime.Parse(ReadValue(doc, "lastModified", DateTime.UtcNow.ToString(CultureInfo.InvariantCulture))).ToUniversalTime(),
                     IsPublished = bool.Parse(ReadValue(doc, "ispublished", "true")),
                 };
 
@@ -350,7 +350,7 @@ namespace Miniblog.Core.Services
 
             return dateTime.Kind == DateTimeKind.Utc
                 ? dateTime.ToString(UTC)
-                : dateTime.MiniBlogToLowerInvariant().ToString(UTC);
+                : dateTime.ToUniversalTime().ToString(UTC);
         }
 
         protected void SortCache()
