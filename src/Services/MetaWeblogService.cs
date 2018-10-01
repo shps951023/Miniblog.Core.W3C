@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using WilderMinds.MetaWeblog;
+using Miniblog.Core.Helper;
 
 namespace Miniblog.Core.Services
 {
@@ -30,11 +31,14 @@ namespace Miniblog.Core.Services
             var newPost = new Models.Post
             {
                 Title = post.title,
-                Slug = !string.IsNullOrWhiteSpace(post.wp_slug) ? post.wp_slug : Models.Post.CreateSlug(post.title),
+                //TODO:假如mt_excerpt為null，取文章前N個字
+                Excerpt= string.IsNullOrWhiteSpace(post.mt_excerpt)? HtmlHelper.HtmlInnerText(post.description): post.mt_excerpt,     
                 Content = post.description,
                 IsPublished = publish,
                 Categories = post.categories
             };
+            //TODO:做成可選擇GUID/時間格式/Title模式
+            newPost.Slug = !string.IsNullOrWhiteSpace(post.wp_slug) ? post.wp_slug : newPost.ID;//(Models.Post.CreateSlug(post.title))
 
             if (post.dateCreated != DateTime.MinValue)
             {
@@ -70,10 +74,13 @@ namespace Miniblog.Core.Services
             if (existing != null)
             {
                 existing.Title = post.title;
-                existing.Slug = post.wp_slug;
+                existing.Slug = post.wp_slug!=null? post.wp_slug : existing.Slug;
                 existing.Content = post.description;
                 existing.IsPublished = publish;
                 existing.Categories = post.categories;
+                //TODO:假如mt_excerpt為null，取文章前N個字
+                existing.Excerpt = string.IsNullOrWhiteSpace(post.mt_excerpt) ? HtmlHelper.HtmlInnerText(post.description) : post.mt_excerpt;  
+
 
                 if (post.dateCreated != DateTime.MinValue)
                 {
@@ -180,7 +187,7 @@ namespace Miniblog.Core.Services
             {
                 postid = post.ID,
                 title = post.Title,
-                wp_slug = post.Slug,
+                wp_slug = post.ID,
                 permalink = url + post.GetLink(),
                 dateCreated = post.PubDate,
                 description = post.Content,

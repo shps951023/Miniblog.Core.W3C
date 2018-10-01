@@ -2,7 +2,7 @@
 @inject IOptionsSnapshot<BlogSettings> settings
 @{
     int currentPage = int.Parse(ViewContext.RouteData.Values["page"] as string ?? "0");
-    var SidebarList = ViewData["SidebarList"] as List<IGrouping<string, PostGroupCatsViewModel>>;
+    var SidebarList = ViewData["SidebarList"] != null ? ViewData["SidebarList"] as List<IGrouping<string, PostGroupCatsViewModel>> : new List<IGrouping<string, PostGroupCatsViewModel>>();
 }
 
 @foreach (var post in Model)
@@ -11,31 +11,43 @@
 }
 
 @section Menu{
-    <div class="w3-container">
-        <h4>@ViewBag.MenuTitle</h4>
-    </div>
-    @foreach (var item in SidebarList)
+
+
+    @if (SidebarList.Count == 1)
     {
+        var items = SidebarList.SingleOrDefault();
         <div class="w3-container">
-            <a class="w3-bar-item w3-button" asp-controller="Blog" asp-action="category"
-               asp-route-category="@item.Key"
-               asp-route-page="">@(item.Key)(@item.Count())</a>
+            <h4>
+                @(items.Key)(@items.Count())
+            </h4>
         </div>
-    }
-    @foreach (var items in SidebarList)
-    {
-        <div class="w3-container">
-            <h4>@items.Key</h4>
-        </div>
-        @foreach (var item in items)
+        @foreach (var post in items)
         {
             <div class="w3-container">
                 <a class="w3-bar-item w3-button" asp-controller="Blog" asp-action="Post"
-                   asp-route-Slug="@item.Slug"
-                   asp-route-page="">@item.Title</a>
+                   asp-route-Slug="@post.Slug"
+                   asp-route-page="">@post.Title</a>
             </div>
         }
     }
+    else
+    {
+        <div class="w3-container">
+            <h4>
+                目錄
+            </h4>
+        </div>
+        @foreach (var item in SidebarList)
+        {
+            <div class="w3-container">
+                <a class="w3-bar-item w3-button" asp-controller="Blog" asp-action="category"
+                   asp-route-category="@item.Key"
+                   asp-route-page="">@item.Key (@item.Count())</a>
+            </div>
+        }
+    }
+
+
 }
 
 <nav class="pagination container" aria-label="Pagination">

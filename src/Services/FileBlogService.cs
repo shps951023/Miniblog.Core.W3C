@@ -20,6 +20,7 @@ namespace Miniblog.Core.Services
         private const string FILES = "files";
 
         private readonly List<Post> _cache = new List<Post>();
+        private readonly List<IGrouping<string,PostGroupCatsViewModel>> _cachePostGroupByCat = new List<IGrouping<string, PostGroupCatsViewModel>>();
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly string _folder;
 
@@ -58,16 +59,9 @@ namespace Miniblog.Core.Services
         public virtual Task<IEnumerable<IGrouping<string, PostGroupCatsViewModel>>> GetPostsGroupbyCategory(string category)
         {
             bool isAdmin = IsAdmin();
-            var postsGroup = _cache
-                .Where(w=> category==null?true:w.Categories.Contains(category))
-                .SelectMany(cat => cat.Categories,
-                    (post, cat) => new PostGroupCatsViewModel
-                    {
-                        Title = post.Title,
-                        Slug = post.Slug,
-                        CatName = cat.ToLowerInvariant()
-                    }
-                ).GroupBy(g=>g.CatName);
+            var postsGroup = _cachePostGroupByCat
+                .Where(w=> category == null ? true : w.Key == category)
+            ;
             return Task.FromResult(postsGroup);
         }
 
@@ -169,6 +163,7 @@ namespace Miniblog.Core.Services
             {
                 _cache.Add(post);
                 SortCache();
+                LoadPostGroupByCat();
             }
         }
 
@@ -184,6 +179,7 @@ namespace Miniblog.Core.Services
             if (_cache.Contains(post))
             {
                 _cache.Remove(post);
+                LoadPostGroupByCat();
             }
 
             return Task.CompletedTask;
@@ -219,6 +215,30 @@ namespace Miniblog.Core.Services
         {
             LoadPosts();
             SortCache();
+            LoadPostGroupByCat();
+        }
+
+        private void ReloadCacheData()
+        {
+            LoadPostGroupByCat();
+        }
+
+        private void LoadPostGroupByCat()
+        {
+            _cachePostGroupByCat.Clear();
+            _cache
+            .SelectMany(cat => cat.Categories,
+                (post, cat) => new PostGroupCatsViewModel
+                {
+                    Title = post.Title,
+                    Slug = post.Slug,
+                    CatName = cat.ToLowerInvariant()
+                }
+            )
+            .GroupBy(g => g.CatName).ToList().ForEach(p=>
+            {
+                _cachePostGroupByCat.Add(p);
+            });
         }
 
         private void LoadPosts()
