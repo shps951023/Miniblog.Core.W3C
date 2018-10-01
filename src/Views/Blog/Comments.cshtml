@@ -2,8 +2,8 @@
 @inject IOptionsSnapshot<BlogSettings> settings
 
 <section id="comments">
-    <div class="container">
-        <h2>Comments</h2>
+    <div class="container" style=" padding: 16px; ">
+        <h2>留言</h2>
         @foreach (var comment in Model.Comments)
         {
             <article id="@comment.ID" class="@(comment.IsAdmin ? "admin" : null)" itemprop="comment" itemscope itemtype="http://schema.org/Comment">
@@ -34,7 +34,7 @@
         {
             if (Model.Comments.Count == 0)
             {
-                <p>Be the first to post a comment</p>
+                <p>任何問題都可以留言</p>
             }
 
             <form method="post" asp-controller="Blog" asp-action="AddComment" asp-route-postid="@Model.ID" asp-antiforgery="false">

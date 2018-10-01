@@ -126,12 +126,12 @@
             <a class="w3-bar-item w3-button w3-left w3-hide-large w3-hover-white w3-large w3-theme w3-padding-16 " href="javascript:void(0)"
                onclick="w3_open()">☰</a>
             <a class="w3-bar-item w3-button w3-hide-medium w3-hide-small w3-hover-white w3-padding-16
-               @(null ==selectcategory?"active":"") "
+               @(null == selectcategory ? "active" : "") "
                href="/">首頁</a>
             @foreach (var item in allCats)
             {
                 <a class="w3-bar-item w3-button w3-hide-medium w3-hide-small w3-hover-white w3-padding-16
-                   @(item ==selectcategory?"active":"")"
+                   @(item == selectcategory ? "active" : "")"
                    asp-controller="Blog" asp-action="category"
                    asp-route-category="@item" asp-route-page="">@item</a>
             }
@@ -141,11 +141,11 @@
     <div class="w3-sidebar w3-bar-block w3-collapse w3-animate-left" style="z-index:3;width:270px" id="mySidebar">
         @* 手機版書籍頁面 *@
         <div class="w3-bar w3-hide-large w3-large">
-            <a class="w3-bar-item w3-button w3-theme w3-hover-white w3-padding-16 @(null ==selectcategory?"active":"")  "
+            <a class="w3-bar-item w3-button w3-theme w3-hover-white w3-padding-16 @(null == selectcategory ? "active" : "")  "
                href="/">首頁</a>
             @foreach (var item in allCats)
             {
-                <a class="w3-bar-item w3-button w3-theme w3-hover-white w3-padding-16 @(item ==selectcategory?"active":"")"
+                <a class="w3-bar-item w3-button w3-theme w3-hover-white w3-padding-16 @(item == selectcategory ? "active" : "")"
                    asp-controller="Blog" asp-action="category"
                    asp-route-category="@item" asp-route-page="">@item</a>
             }
@@ -155,6 +155,7 @@
         <div id="menuTut" class="myMenu">
             <br>
             @RenderSection("Menu", required: false)
+            @{ await Html.RenderPartialAsync("CustomSideMenu"); }
         </div>
     </div>
 

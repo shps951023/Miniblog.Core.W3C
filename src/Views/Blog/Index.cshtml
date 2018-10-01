@@ -18,7 +18,7 @@
         var items = SidebarList.SingleOrDefault();
         <div class="w3-container">
             <h4>
-                @(items.Key)(@items.Count())
+                @(items.Key) <br> (@items.Count() 篇文章)
             </h4>
         </div>
         @foreach (var post in items)
@@ -42,7 +42,7 @@
             <div class="w3-container">
                 <a class="w3-bar-item w3-button" asp-controller="Blog" asp-action="category"
                    asp-route-category="@item.Key"
-                   asp-route-page="">@item.Key (@item.Count())</a>
+                   asp-route-page="">@item.Key (@item.Count() 篇文章)</a>
             </div>
         }
     }
