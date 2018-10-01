@@ -1,88 +1,67 @@
-# Blog engine for ASP.NET Core 2.0
+﻿## 獻給第10屆鐵人賽，Miniblog.Core❤️W3C專案
 
-A full-featured yet simple blog engine built on ASP.NET Core 2.0.
+使用MiniBlog的NETCore技術加上W3C介面來整理IT鐵人賽的文章
+歡迎IT人使用、回饋。
+因為剛接觸NETCore，有不正確的地方麻煩告知，我會盡快修正。
+Github連結:[W3CMiniblog.Core-Theme-W3C](https://github.com/shps951023/W3CMiniblog.Core-Theme-W3C)
 
-[![Build status](https://ci.appveyor.com/api/projects/status/lwjrlpvmhg50wwbs?svg=true)](https://ci.appveyor.com/project/madskristensen/miniblog-core)
-[![NuGet](https://img.shields.io/nuget/v/MadsKristensen.AspNetCore.Miniblog.svg)](https://nuget.org/packages/MadsKristensen.AspNetCore.Miniblog/)
 
-[![Deploy to Azure](http://azuredeploy.net/deploybutton.png)](https://azuredeploy.net/)
+---
 
-**Live demo**: <https://miniblogcore.azurewebsites.net/>  
-Username: *demo*  
-Password: *demo*
+Live demo: https://miniblogcorew3c.azurewebsites.net
+帳號: demo
+密碼: demo
 
-![Editor](art/editor.png)
+---
 
-### Custom themes
-In search for custom designed themes for MiniBlog.Core? [Click here](https://francis.bio/miniblog-themes/).
+## 修改、新增功能:
+- 新增W3C介面
+- [待完成]支持MarkDown
+- [待完成]支援SQL-Server
+- [待完成]支援SQLite
+- [待完成]支持Leanote API發布文章
+- [待完成]支持Imgur圖床
+- [待完成]MetaWeblog改成非同步、可自訂
+- [待完成]SQLite支持
 
-## Features
-- Windows/Open Live Writer support
-- RSS and ATOM feeds
-- User comments
-- Search engine optimized
-- All major browsers fully supported (IE 9+)
-- Social media integration (Facebook, Twitter, Google+)
-- Lazy loads images for better performance
-- Easy YouTube video embedding
-- Looks great when printed
-- Works offline with use of [Service Worker](https://developers.google.com/web/fundamentals/primers/service-workers/)
-- Follows best practices for web applications
-  - [See DareBoost report](https://www.dareboost.com/en/report/59e928f10cf224d151dfbe2d)
+--- 
 
-## Technical features
-- High performance. Gets 100/100 points on Google PageSpeed Insights 
-  - [Run PageSpeed Insights](https://developers.google.com/speed/pagespeed/insights/?url=https%3A%2F%2Fminiblogcore.azurewebsites.net%2F)
-- Speed Index < 1000
-  - [See WebPageTest](http://www.webpagetest.org/result/170928_1R_cf91bb2d800cc389821c5cfa7e353f0d/) 
-- Meets highest accessibility standards 
-  - [Run accessibility validator](http://wave.webaim.org/report#/https://miniblogcore.azurewebsites.net/)
-- W3C standards compliant 
-  - [Run HTML validator](https://html5.validator.nu/?doc=https%3A%2F%2Fminiblogcore.azurewebsites.net%2F)
-  - [Run RSS validator](https://validator.w3.org/feed/check.cgi?url=https%3A%2F%2Fminiblogcore.azurewebsites.net%2Ffeed%2Frss%2F)
-- Responsive web design
-  - [See mobile emulators](https://www.responsinator.com/?url=https%3A%2F%2Fminiblogcore.azurewebsites.net%2F)
-- Mobile friendly
-  - [Run Mobile-Friendly Test](https://search.google.com/test/mobile-friendly?id=i4i-jw3VafvYnjcyHt4jgg)
-- Schema.org support with HTML 5 Microdata 
-  - [Run testing tool](https://search.google.com/structured-data/testing-tool#url=https%3A%2F%2Fminiblogcore.azurewebsites.net%2F)
-- OpenGraph support for Facebook, Twitter, Pinterest and more
-  - [Run Facebook validator](https://developers.facebook.com/tools/debug/sharing/?q=https%3A%2F%2Fminiblogcore.azurewebsites.net%2F)
-  - [Check the tags](http://opengraphcheck.com/result.php?url=https%3A%2F%2Fminiblogcore.azurewebsites.net%2F#.WdhRDjBlB3g)
-- Seach engine optimized
-  - [Run SEO Site Checkup](https://seositecheckup.com/seo-audit/miniblogcore.azurewebsites.net)
-- Security HTTP headers set
-  - [Run security scan](https://securityheaders.io/?q=https%3A%2F%2Fminiblogcore.azurewebsites.net%2F&hide=on&followRedirects=on)
-- Uses the [Azure Image Optimizer](https://github.com/madskristensen/ImageOptimizerWebJob) for superb image compression
-- Uses a [CDN Tag Helper](https://github.com/madskristensen/WebEssentials.AspNetCore.CdnTagHelpers) to make it easy to serve the images from any CDN.
+## 快速開始
+1.clone project
+2.open .sln
+3.運行專案
 
-### YouTube embeds
-You can embed any youtube video by using the following syntax in the source of a blog post:
+---
 
-```
-[youtube:ScXvuavqhzo]
-```
+## 手冊連結(完善中):https://itweihan.azurewebsites.net/
 
-*ScXvuavqhzo* is the ID of the YouTube video which can be found in any YouTube link looking this *youtube.com/watch?v=**ScXvuavqhzo***
 
-## How to use
-On the command line, install the template.
+## 使用手冊
+- [如何支援SQL-Server]
+- [如何支援SQLLite]
+- [如何修改頁面]
+- [如何串接、使用LeanoteBlogAPI]
+- [專案設定]
+    - 標籤、文章轉小寫
+    - Slug是否要自動產生
+    - 增加、修改設定
+- [修改MarkDown格式] 
+- [如何改寫MetaWeblog功能]
 
-```cmd
-dotnet new --install MadsKristensen.AspNetCore.Miniblog
-```
 
-Then create it into any folder.
+### 技術手冊
+- [了解Startup.CS(上)]
+- [了解Startup.CS(下)]
+- [了解PWA功能介紹(上)]
+- [了解PWA功能介紹(下)]
+- [了解MetaWeblog功能(上)]
+- [了解MetaWeblog功能(下)]
 
-```cmd
-dotnet new miniblog
-```
 
-Then run it or open it in Visual Studio or your favorite code editor.
+---
 
-```cmd
-dotnet run
-```
-
-## Credits
-SVG icons by <https://simpleicons.org/>
+## 使用技術
+- [Miniblog.Core](https://github.com/madskristensen/Miniblog.Core) (感謝madskristensen開源高效能的BlogEngine )
+- [W3.CSS](https://www.w3schools.com/w3css/w3css_downloads.asp)
+- [MetaWeblog](https://github.com/shawnwildermuth/MetaWeblog)
+- [AngleSharp](https://github.com/AngleSharp/AngleSharp)

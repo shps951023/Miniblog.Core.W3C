@@ -6,6 +6,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\Posts\**" />
+    <Content Remove="wwwroot\Posts\**" />
+    <EmbeddedResource Remove="wwwroot\Posts\**" />
+    <None Remove="wwwroot\Posts\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AngleSharp" Version="0.9.10" />
     <PackageReference Include="Azure.ImageOptimizer" Version="1.1.0.39" />
     <PackageReference Include="LigerShark.WebOptimizer.Core" Version="1.0.197" />
