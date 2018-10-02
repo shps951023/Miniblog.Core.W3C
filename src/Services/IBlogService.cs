@@ -53,24 +53,6 @@ namespace Miniblog.Core.Services
             return Task.FromResult(posts);
         }
 
-
-        public virtual Task<IEnumerable<IGrouping<string, PostGroupCatsViewModel>>> GetPostsGroupbyCategory(string category)
-        {
-            bool isAdmin = IsAdmin();
-
-            var posts = Cache
-                .Where(p => p.IsPublished || isAdmin)
-                .SelectMany(post => post.Categories)
-                .Select(cat => cat.MiniBlogToLowerInvariant())
-            //.GroupBy(g => g.Categories.)
-            ;
-
-            //var postsGroup = _cache.
-
-            //return Task.FromResult(posts);
-            return null;
-        }
-
         public virtual Task<IEnumerable<Post>> GetPostsByCategory(string category)
         {
             bool isAdmin = IsAdmin();
@@ -151,6 +133,11 @@ namespace Miniblog.Core.Services
         protected bool IsAdmin()
         {
             return ContextAccessor.HttpContext?.User?.Identity.IsAuthenticated == true;
+        }
+
+        public Task<IEnumerable<IGrouping<string, PostGroupCatsViewModel>>> GetPostsGroupbyCategory(string category)
+        {
+            throw new NotImplementedException();
         }
     }
 }

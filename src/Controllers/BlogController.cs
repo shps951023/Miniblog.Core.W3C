@@ -204,7 +204,11 @@ namespace Miniblog.Core.Controllers
             if (!Request.Form.ContainsKey("website"))
             {
                 post.Comments.Add(comment);
-                await _blog.SavePost(post);
+                //DONE:如果是SQLService直接增加就好
+                if (_blog is MSSqlBlogService)
+                    await (_blog as MSSqlBlogService).SaveComment(post, comment);
+                else
+                    await _blog.SavePost(post);              
             }
 
             return Redirect(post.GetLink() + "#" + comment.ID);
@@ -229,7 +233,11 @@ namespace Miniblog.Core.Controllers
             }
 
             post.Comments.Remove(comment);
-            await _blog.SavePost(post);
+            //DONE:如果是SQLService直接增加就好
+            if (_blog is MSSqlBlogService)
+                await (_blog as MSSqlBlogService).DeleteComment(post, comment);
+            else
+                await _blog.SavePost(post);
 
             return Redirect(post.GetLink() + "#comments");
         }
