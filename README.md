@@ -15,7 +15,10 @@ Live demo: https://miniblogcorew3c.azurewebsites.net <br/>
 
 ---
 
-## 快速開始:[2.快速開始專案](https://itweihan.azurewebsites.net/blog/miniblog_quick_start)
+## 快速開始:[快速開始專案](https://itweihan.azurewebsites.net/blog/miniblog_quick_start)
+**操作影片:**
+[![Yes](https://img.youtube.com/vi/4wX9qDPa4q0/0.jpg)](https://www.youtube.com/watch?v=4wX9qDPa4q0)
+
 
 
 ---
