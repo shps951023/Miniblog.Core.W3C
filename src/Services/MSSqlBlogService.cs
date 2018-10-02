@@ -245,7 +245,6 @@ namespace Miniblog.Core.Services
         }
         #endregion
 
-
         #region 不屬於介面方法(補助方法)
 
         protected void SortCache()

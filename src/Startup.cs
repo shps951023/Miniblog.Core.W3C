@@ -46,7 +46,10 @@ namespace Miniblog.Core
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddSingleton<IUserServices, BlogUserServices>();
-            services.AddSingleton<IBlogService, FileBlogService>();
+            //決定使用XML或是SQL讀取資料
+            //services.AddSingleton<IBlogService, MSSqlBlogService>();/*SQL-Server*/
+            services.AddSingleton<IBlogService, FileBlogService>();/*XML*/
+
             services.Configure<BlogSettings>(Configuration.GetSection("blog"));
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddMetaWeblog<MetaWeblogService>();
