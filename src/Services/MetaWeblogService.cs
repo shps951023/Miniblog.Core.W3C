@@ -84,7 +84,11 @@ namespace Miniblog.Core.Services
 
                 if (post.dateCreated != DateTime.MinValue)
                 {
-                    existing.PubDate = post.dateCreated.ToUniversalTime();
+                    //如果日期超過，以現在為準
+                    if(post.dateCreated.ToUniversalTime()>DateTime.UtcNow)
+                        existing.PubDate = DateTime.UtcNow;
+                    else
+                        existing.PubDate = post.dateCreated;
                 }
 
                 _blog.SavePost(existing).GetAwaiter().GetResult();

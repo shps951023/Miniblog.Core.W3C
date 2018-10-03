@@ -6,10 +6,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Scripts\**" />
     <Compile Remove="wwwroot\Posts\**" />
+    <Content Remove="Scripts\**" />
     <Content Remove="wwwroot\Posts\**" />
+    <EmbeddedResource Remove="Scripts\**" />
     <EmbeddedResource Remove="wwwroot\Posts\**" />
+    <None Remove="Scripts\**" />
     <None Remove="wwwroot\Posts\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="MSSqlCreateTableScript.sql" />
   </ItemGroup>
 
   <ItemGroup>
