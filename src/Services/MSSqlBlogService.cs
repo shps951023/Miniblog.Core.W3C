@@ -34,7 +34,9 @@ namespace Miniblog.Core.Services
                 {
                     await conn.ExecuteAsync(@"
                         UPDATE Post
-                        SET Title = @Title,Slug = @Slug,Excerpt = @Excerpt,Content = @Content,PubDate = @PubDate,LastModified = @LastModified,IsPublished = @IsPublished
+                        SET Title = @Title,Slug = @Slug,Excerpt = @Excerpt,Content = @Content
+                            ,PubDate = @PubDate,LastModified = @LastModified,IsPublished = @IsPublished
+                            ,MarkDownContent = @MarkDownContent,IsMarkDown = @IsMarkDown
                         WHERE ID = @ID
                     ", post);
                     await conn.ExecuteAsync(@"
@@ -48,8 +50,8 @@ namespace Miniblog.Core.Services
                 else
                 {
                     await conn.ExecuteAsync(@"
-                        INSERT INTO Post(ID,Title,Slug,Excerpt,Content,PubDate,LastModified,IsPublished)
-                        VALUES (@ID,@Title,@Slug,@Excerpt,@Content,@PubDate,@LastModified,@IsPublished)
+                        INSERT INTO Post(ID,Title,Slug,Excerpt,Content,PubDate,LastModified,IsPublished,MarkDownContent,IsMarkDown)
+                        VALUES (@ID,@Title,@Slug,@Excerpt,@Content,@PubDate,@LastModified,@IsPublished,@MarkDownContent,@IsMarkDown)
                     ", post);
                     var cats = post.Categories.Select(s => new { PostID = post.ID, Name = s }).ToList();
                     await conn.ExecuteAsync(@"

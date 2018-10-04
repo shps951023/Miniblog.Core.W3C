@@ -157,7 +157,7 @@ namespace Miniblog.Core.Controllers
                     if (base64Match.Success)
                     {
                         byte[] bytes = Convert.FromBase64String(base64Match.Groups["base64"].Value);
-                        srcNode.Value = await _blog.SaveFile(bytes, fileNameNode.Value).ConfigureAwait(false);
+                        srcNode.Value = await _blog.SaveFileAsync(bytes, fileNameNode.Value).ConfigureAwait(false);
 
                         img.Attributes.Remove(fileNameNode);
                         post.Content = post.Content.Replace(match.Value, img.OuterXml);
