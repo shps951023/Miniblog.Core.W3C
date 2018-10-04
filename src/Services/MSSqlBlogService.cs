@@ -13,111 +13,18 @@ using System.Transactions;
 
 namespace Miniblog.Core.Services
 {
-    public class MSSqlBlogService : IBlogService
+    public class MSSqlBlogService : InMemoryBlogServiceBase
     {
-        private const string POSTS = "Posts";
-        private const string FILES = "files";
-
-        private readonly List<Post> _cache = new List<Post>();
-        private readonly List<IGrouping<string, PostGroupCatsViewModel>> _cachePostGroupByCat = new List<IGrouping<string, PostGroupCatsViewModel>>();
-        private readonly IHttpContextAccessor _contextAccessor;
-        private readonly string _folder;
-
         public MSSqlBlogService(IHostingEnvironment env, IHttpContextAccessor contextAccessor)
         {
-            _folder = Path.Combine(env.WebRootPath, POSTS);  /*在SQLBlog，路徑主要給存圖片使用。*/
+            _folder = Path.Combine(env.WebRootPath, POSTS);
             _contextAccessor = contextAccessor;
+
             Initialize();
         }
 
-        #region Cache存取資料方法  /*通常不用動到這邊的Code，因為邏輯幾乎一樣*/
-        public virtual Task<IEnumerable<Post>> GetPosts(int count, int skip = 0)
-        {
-            bool isAdmin = IsAdmin();
-
-            var posts = _cache
-                .Where(p => p.PubDate <= DateTime.UtcNow && (p.IsPublished || isAdmin))
-                .Skip(skip)
-                .Take(count);
-
-            return Task.FromResult(posts);
-        }
-
-        public virtual Task<IEnumerable<Post>> GetPostsByCategory(string category)
-        {
-            bool isAdmin = IsAdmin();
-
-            var posts = from p in _cache
-                        where p.PubDate <= DateTime.UtcNow && (p.IsPublished || isAdmin)
-                        where p.Categories.Contains(category, StringComparer.OrdinalIgnoreCase)
-                        select p;
-
-            return Task.FromResult(posts);
-        }
-
-        public virtual Task<IEnumerable<IGrouping<string, PostGroupCatsViewModel>>> GetPostsGroupbyCategory(string category)
-        {
-            bool isAdmin = IsAdmin();
-            var postsGroup = _cachePostGroupByCat
-                .Where(w => category == null ? true : w.Key == category)
-            ;
-            return Task.FromResult(postsGroup);
-        }
-
-        public virtual Task<Post> GetPostBySlug(string slug)
-        {
-            var post = _cache.FirstOrDefault(p => p.Slug.Equals(slug, StringComparison.OrdinalIgnoreCase));
-            bool isAdmin = IsAdmin();
-
-            if (post != null && post.PubDate <= DateTime.UtcNow && (post.IsPublished || isAdmin))
-            {
-                return Task.FromResult(post);
-            }
-
-            return Task.FromResult<Post>(null);
-        }
-
-        public virtual Task<IEnumerable<Post>> GetPostsByCat(string cat)
-        {
-            bool isAdmin = IsAdmin();
-
-            var posts = from p in _cache
-                        where p.PubDate <= DateTime.Now && (p.IsPublished || isAdmin)
-                        where p.Categories.Contains(cat.MiniBlogToLowerInvariant())
-                        select p;
-
-            return Task.FromResult(posts);
-        }
-
-        public virtual Task<Post> GetPostById(string id)
-        {
-            var post = _cache.FirstOrDefault(p => p.ID.Equals(id, StringComparison.OrdinalIgnoreCase));
-            bool isAdmin = IsAdmin();
-
-            if (post != null && post.PubDate <= DateTime.UtcNow && (post.IsPublished || isAdmin))
-            {
-                return Task.FromResult(post);
-            }
-
-            return Task.FromResult<Post>(null);
-        }
-
-        public virtual Task<IEnumerable<string>> GetCategories()
-        {
-            bool isAdmin = IsAdmin();
-
-            var categories = _cache
-                .Where(p => p.IsPublished || isAdmin)
-                .SelectMany(post => post.Categories)
-                .Select(cat => cat.MiniBlogToLowerInvariant())
-                .Distinct();
-
-            return Task.FromResult(categories);
-        }
-        #endregion /**/
-
-        #region 增刪修改(每個資料庫需要改寫)
-        public async Task SavePost(Post post)
+        #region 改寫部分(override)
+        public override async Task SavePost(Post post)
         {
             post.LastModified = DateTime.UtcNow;
             using (var conn = SqlHelper.CreateDefaultConnection())
@@ -161,7 +68,7 @@ namespace Miniblog.Core.Services
             ReloadCacheData();
         }
 
-        public Task DeletePost(Post post)
+        public override Task DeletePost(Post post)
         {
             using (var conn = SqlHelper.CreateDefaultConnection())
             {
@@ -182,6 +89,30 @@ namespace Miniblog.Core.Services
 
             return Task.CompletedTask;
         }
+
+        public override async Task<string> SaveFileAsync(byte[] bytes, string fileName, string suffix = null)
+        {
+            suffix = CleanFromInvalidChars(suffix ?? DateTime.UtcNow.Ticks.ToString());
+
+            string ext = Path.GetExtension(fileName);
+            string name = CleanFromInvalidChars(Path.GetFileNameWithoutExtension(fileName));
+
+            string fileNameWithSuffix = $"{name}_{suffix}{ext}";
+
+            string absolute = Path.Combine(_folder, FILES, fileNameWithSuffix);
+            string dir = Path.GetDirectoryName(absolute);
+
+            Directory.CreateDirectory(dir);
+            using (var writer = new FileStream(absolute, FileMode.CreateNew))
+            {
+                await writer.WriteAsync(bytes, 0, bytes.Length).ConfigureAwait(false);
+            }
+
+            return $"/{POSTS}/{FILES}/{fileNameWithSuffix}";
+        }
+        #endregion
+
+        #region 不屬於介面方法(資料存取)
 
         public async Task SaveComment(Post post, Comment comment)
         {
@@ -211,7 +142,7 @@ namespace Miniblog.Core.Services
             }
         }
 
-        private static void LoadCategories(Post post, System.Data.IDbConnection conn)
+        private void LoadCategories(Post post, System.Data.IDbConnection conn)
         {
             List<string> list = conn.Query<string>(@"
                 select Name from Categories where postid = @ID 
@@ -219,7 +150,7 @@ namespace Miniblog.Core.Services
             post.Categories = list.ToArray();
         }
 
-        private static void LoadComments(Post post, System.Data.IDbConnection conn)
+        private void LoadComments(Post post, System.Data.IDbConnection conn)
         {
             var comments = conn.Query<Comment>(@"
                 select * from Comment where postid = @ID 
@@ -228,33 +159,6 @@ namespace Miniblog.Core.Services
             {
                 post.Comments.Add(comment);
             }
-        }
-
-        private void LoadPosts()
-        {
-            using (var conn = SqlHelper.CreateDefaultConnection())
-            {
-                var posts = conn.Query<Post>("select * from Post");
-                foreach (var post in posts)
-                {
-                    LoadCategories(post, conn);
-                    LoadComments(post, conn);
-                    _cache.Add(post);
-                }
-            }
-        }
-        #endregion
-
-        #region 不屬於介面方法(補助方法)
-
-        protected void SortCache()
-        {
-            _cache.Sort((p1, p2) => p2.PubDate.CompareTo(p1.PubDate));
-        }
-
-        protected bool IsAdmin()
-        {
-            return _contextAccessor.HttpContext?.User?.Identity.IsAuthenticated == true;
         }
 
         private void Initialize()
@@ -267,6 +171,7 @@ namespace Miniblog.Core.Services
         private void ReloadCacheData()
         {
             LoadPostGroupByCat();
+            //TODO:MarkDown Content
         }
 
         private void LoadPostGroupByCat()
@@ -287,6 +192,22 @@ namespace Miniblog.Core.Services
             });
         }
 
+        private void LoadPosts()
+        {
+            using (var conn = SqlHelper.CreateDefaultConnection())
+            {
+                var posts = conn.Query<Post>("select * from Post");
+                foreach (var post in posts)
+                {
+                    LoadCategories(post, conn);
+                    LoadComments(post, conn);
+                    _cache.Add(post);
+                }
+            }
+        }
+        #endregion
+
+        #region 不屬於介面方法(輔助)
         private static string CleanFromInvalidChars(string input)
         {
             // ToDo: what we are doing here if we switch the blog from windows
@@ -296,30 +217,6 @@ namespace Miniblog.Core.Services
             var r = new Regex($"[{regexSearch}]");
             return r.Replace(input, "");
         }
-
-        public async Task<string> SaveFile(byte[] bytes, string fileName, string suffix = null)
-        {
-            suffix = CleanFromInvalidChars(suffix ?? DateTime.UtcNow.Ticks.ToString());
-
-            string ext = Path.GetExtension(fileName);
-            string name = CleanFromInvalidChars(Path.GetFileNameWithoutExtension(fileName));
-
-            string fileNameWithSuffix = $"{name}_{suffix}{ext}";
-
-            string absolute = Path.Combine(_folder, FILES, fileNameWithSuffix);
-            string dir = Path.GetDirectoryName(absolute);
-
-            Directory.CreateDirectory(dir);
-            using (var writer = new FileStream(absolute, FileMode.CreateNew))
-            {
-                await writer.WriteAsync(bytes, 0, bytes.Length).ConfigureAwait(false);
-            }
-
-            return $"/{POSTS}/{FILES}/{fileNameWithSuffix}";
-        }
-
         #endregion
-
-
     }
 }

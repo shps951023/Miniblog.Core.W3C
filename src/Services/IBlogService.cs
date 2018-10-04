@@ -15,7 +15,6 @@ namespace Miniblog.Core.Services
 
         Task<IEnumerable<IGrouping<string, PostGroupCatsViewModel>>> GetPostsGroupbyCategory(string category);
 
-
         Task<IEnumerable<Post>> GetPostsByCat(string book);
 
         Task<Post> GetPostBySlug(string slug);
@@ -28,24 +27,26 @@ namespace Miniblog.Core.Services
 
         Task DeletePost(Post post);
 
-        Task<string> SaveFile(byte[] bytes, string fileName, string suffix = null);
+        Task<string> SaveFileAsync(byte[] bytes, string fileName, string suffix = null);
     }
 
     public abstract class InMemoryBlogServiceBase : IBlogService
     {
-        public InMemoryBlogServiceBase(IHttpContextAccessor contextAccessor)
-        {
-            ContextAccessor = contextAccessor;
-        }
+        protected const string POSTS = "Posts";
+        protected const string FILES = "files";
 
-        protected List<Post> Cache { get; set; }
-        protected IHttpContextAccessor ContextAccessor { get; }
+        protected  List<Post> _cache = new List<Post>();
+        protected  List<IGrouping<string, PostGroupCatsViewModel>> _cachePostGroupByCat = new List<IGrouping<string, PostGroupCatsViewModel>>();
+        protected  IHttpContextAccessor _contextAccessor;
+        protected  string _folder;
+
+        public InMemoryBlogServiceBase(){}
 
         public virtual Task<IEnumerable<Post>> GetPosts(int count, int skip = 0)
         {
             bool isAdmin = IsAdmin();
 
-            var posts = Cache
+            var posts = _cache
                 .Where(p => p.PubDate <= DateTime.UtcNow && (p.IsPublished || isAdmin))
                 .Skip(skip)
                 .Take(count);
@@ -57,18 +58,17 @@ namespace Miniblog.Core.Services
         {
             bool isAdmin = IsAdmin();
 
-            var posts = from p in Cache
+            var posts = from p in _cache
                         where p.PubDate <= DateTime.UtcNow && (p.IsPublished || isAdmin)
                         where p.Categories.Contains(category, StringComparer.OrdinalIgnoreCase)
                         select p;
 
             return Task.FromResult(posts);
-
         }
 
         public virtual Task<Post> GetPostBySlug(string slug)
         {
-            var post = Cache.FirstOrDefault(p => p.Slug.Equals(slug, StringComparison.OrdinalIgnoreCase));
+            var post = _cache.FirstOrDefault(p => p.Slug.Equals(slug, StringComparison.OrdinalIgnoreCase));
             bool isAdmin = IsAdmin();
 
             if (post != null && post.PubDate <= DateTime.UtcNow && (post.IsPublished || isAdmin))
@@ -83,7 +83,7 @@ namespace Miniblog.Core.Services
         {
             bool isAdmin = IsAdmin();
 
-            var posts = from p in Cache
+            var posts = from p in _cache
                         where p.PubDate <= DateTime.Now && (p.IsPublished || isAdmin)
                         where p.Categories.Contains(cat.MiniBlogToLowerInvariant())
                         select p;
@@ -91,11 +91,9 @@ namespace Miniblog.Core.Services
             return Task.FromResult(posts);
         }
 
-
-
         public virtual Task<Post> GetPostById(string id)
         {
-            var post = Cache.FirstOrDefault(p => p.ID.Equals(id, StringComparison.OrdinalIgnoreCase));
+            var post = _cache.FirstOrDefault(p => p.ID.Equals(id, StringComparison.OrdinalIgnoreCase));
             bool isAdmin = IsAdmin();
 
             if (post != null && post.PubDate <= DateTime.UtcNow && (post.IsPublished || isAdmin))
@@ -110,7 +108,7 @@ namespace Miniblog.Core.Services
         {
             bool isAdmin = IsAdmin();
 
-            var categories = Cache
+            var categories = _cache
                 .Where(p => p.IsPublished || isAdmin)
                 .SelectMany(post => post.Categories)
                 .Select(cat => cat.MiniBlogToLowerInvariant())
@@ -119,25 +117,31 @@ namespace Miniblog.Core.Services
             return Task.FromResult(categories);
         }
 
+        public Task<IEnumerable<IGrouping<string, PostGroupCatsViewModel>>> GetPostsGroupbyCategory(string category)
+        {
+            bool isAdmin = IsAdmin();
+            var postsGroup = _cachePostGroupByCat
+                .Where(w => category == null ? true : w.Key == category)
+            ;
+            return Task.FromResult(postsGroup);
+        }
+
         public abstract Task SavePost(Post post);
 
         public abstract Task DeletePost(Post post);
 
-        public abstract Task<string> SaveFile(byte[] bytes, string fileName, string suffix = null);
+        public abstract Task<string> SaveFileAsync(byte[] bytes, string fileName, string suffix = null);
 
-        protected void SortCache()
+        public void SortCache()
         {
-            Cache.Sort((p1, p2) => p2.PubDate.CompareTo(p1.PubDate));
+            _cache.Sort((p1, p2) => p2.PubDate.CompareTo(p1.PubDate));
         }
 
         protected bool IsAdmin()
         {
-            return ContextAccessor.HttpContext?.User?.Identity.IsAuthenticated == true;
+            return _contextAccessor.HttpContext?.User?.Identity.IsAuthenticated == true;
         }
 
-        public Task<IEnumerable<IGrouping<string, PostGroupCatsViewModel>>> GetPostsGroupbyCategory(string category)
-        {
-            throw new NotImplementedException();
-        }
+
     }
 }

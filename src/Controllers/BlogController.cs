@@ -125,6 +125,9 @@ namespace Miniblog.Core.Controllers
             existing.IsPublished = post.IsPublished;
             existing.Content = post.Content.Trim();
             existing.Excerpt = post.Excerpt.Trim();
+            //Done:MarkDown判斷，渲染
+            existing.MarkDownContent  = post.MarkDownContent.Trim();
+            existing.IsMarkDown = post.IsMarkDown;
 
             await _blog.SavePost(existing);
 

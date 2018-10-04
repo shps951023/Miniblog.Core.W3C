@@ -12,18 +12,11 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
+
 namespace Miniblog.Core.Services
 {
-    public class FileBlogService : IBlogService
+    public class FileBlogService : InMemoryBlogServiceBase
     {
-        private const string POSTS = "Posts";
-        private const string FILES = "files";
-
-        private readonly List<Post> _cache = new List<Post>();
-        private readonly List<IGrouping<string,PostGroupCatsViewModel>> _cachePostGroupByCat = new List<IGrouping<string, PostGroupCatsViewModel>>();
-        private readonly IHttpContextAccessor _contextAccessor;
-        private readonly string _folder;
-
         public FileBlogService(IHostingEnvironment env, IHttpContextAccessor contextAccessor)
         {
             _folder = Path.Combine(env.WebRootPath, POSTS);
@@ -32,91 +25,8 @@ namespace Miniblog.Core.Services
             Initialize();
         }
 
-        public virtual Task<IEnumerable<Post>> GetPosts(int count, int skip = 0)
-        {
-            bool isAdmin = IsAdmin();
-
-            var posts = _cache
-                .Where(p => p.PubDate <= DateTime.UtcNow && (p.IsPublished || isAdmin))
-                .Skip(skip)
-                .Take(count);
-
-            return Task.FromResult(posts);
-        }
-
-        public virtual Task<IEnumerable<Post>> GetPostsByCategory(string category)
-        {
-            bool isAdmin = IsAdmin();
-
-            var posts = from p in _cache
-                        where p.PubDate <= DateTime.UtcNow && (p.IsPublished || isAdmin)
-                        where p.Categories.Contains(category, StringComparer.OrdinalIgnoreCase)
-                        select p;
-
-            return Task.FromResult(posts);
-        }
-
-        public virtual Task<IEnumerable<IGrouping<string, PostGroupCatsViewModel>>> GetPostsGroupbyCategory(string category)
-        {
-            bool isAdmin = IsAdmin();
-            var postsGroup = _cachePostGroupByCat
-                .Where(w=> category == null ? true : w.Key == category)
-            ;
-            return Task.FromResult(postsGroup);
-        }
-
-        public virtual Task<Post> GetPostBySlug(string slug)
-        {
-            var post = _cache.FirstOrDefault(p => p.Slug.Equals(slug, StringComparison.OrdinalIgnoreCase));
-            bool isAdmin = IsAdmin();
-
-            if (post != null && post.PubDate <= DateTime.UtcNow && (post.IsPublished || isAdmin))
-            {
-                return Task.FromResult(post);
-            }
-
-            return Task.FromResult<Post>(null);
-        }
-
-        public virtual Task<IEnumerable<Post>> GetPostsByCat(string cat)
-        {
-            bool isAdmin = IsAdmin();
-
-            var posts = from p in _cache
-                        where p.PubDate <= DateTime.Now && (p.IsPublished || isAdmin)
-                        where p.Categories.Contains(cat.MiniBlogToLowerInvariant())
-                        select p;
-
-            return Task.FromResult(posts);
-        }
-
-        public virtual Task<Post> GetPostById(string id)
-        {
-            var post = _cache.FirstOrDefault(p => p.ID.Equals(id, StringComparison.OrdinalIgnoreCase));
-            bool isAdmin = IsAdmin();
-
-            if (post != null && post.PubDate <= DateTime.UtcNow && (post.IsPublished || isAdmin))
-            {
-                return Task.FromResult(post);
-            }
-
-            return Task.FromResult<Post>(null);
-        }
-
-        public virtual Task<IEnumerable<string>> GetCategories()
-        {
-            bool isAdmin = IsAdmin();
-
-            var categories = _cache
-                .Where(p => p.IsPublished || isAdmin)
-                .SelectMany(post => post.Categories)
-                .Select(cat => cat.MiniBlogToLowerInvariant())
-                .Distinct();
-
-            return Task.FromResult(categories);
-        }
-
-        public async Task SavePost(Post post)
+        #region 改寫部分(override)
+        public override async Task SavePost(Post post)
         {
             string filePath = GetFilePath(post);
             post.LastModified = DateTime.UtcNow;
@@ -129,6 +39,8 @@ namespace Miniblog.Core.Services
                                 new XElement("lastModified", FormatDateTime(post.LastModified)),
                                 new XElement("excerpt", post.Excerpt),
                                 new XElement("content", post.Content),
+                                new XElement("markDownContent", post.MarkDownContent),
+                                new XElement("isMarkDown", post.IsMarkDown),
                                 new XElement("ispublished", post.IsPublished),
                                 new XElement("categories", string.Empty),
                                 new XElement("comments", string.Empty)
@@ -167,7 +79,7 @@ namespace Miniblog.Core.Services
             ReloadCacheData();
         }
 
-        public Task DeletePost(Post post)
+        public override Task DeletePost(Post post)
         {
             string filePath = GetFilePath(post);
 
@@ -185,7 +97,7 @@ namespace Miniblog.Core.Services
             return Task.CompletedTask;
         }
 
-        public async Task<string> SaveFile(byte[] bytes, string fileName, string suffix = null)
+        public override async Task<string> SaveFileAsync(byte[] bytes, string fileName, string suffix = null)
         {
             suffix = CleanFromInvalidChars(suffix ?? DateTime.UtcNow.Ticks.ToString());
 
@@ -205,12 +117,9 @@ namespace Miniblog.Core.Services
 
             return $"/{POSTS}/{FILES}/{fileNameWithSuffix}";
         }
+        #endregion
 
-        private string GetFilePath(Post post)
-        {
-            return Path.Combine(_folder, post.ID + ".xml");
-        }
-
+        #region 不屬於介面方法(資料存取)
         private void Initialize()
         {
             LoadPosts();
@@ -259,10 +168,12 @@ namespace Miniblog.Core.Services
                     Title = ReadValue(doc, "title"),
                     Excerpt = ReadValue(doc, "excerpt"),
                     Content = ReadValue(doc, "content"),
+                    MarkDownContent = ReadValue(doc, "markDownContent"),
                     Slug = ReadValue(doc, "slug").MiniBlogToLowerInvariant(),
                     PubDate = DateTime.Parse(ReadValue(doc, "pubDate")).ToUniversalTime(),
                     LastModified = DateTime.Parse(ReadValue(doc, "lastModified", DateTime.UtcNow.ToString(CultureInfo.InvariantCulture))).ToUniversalTime(),
                     IsPublished = bool.Parse(ReadValue(doc, "ispublished", "true")),
+                    IsMarkDown = bool.Parse(ReadValue(doc, "isMarkDown", "false")),
                 };
 
                 LoadCategories(post, doc);
@@ -313,6 +224,13 @@ namespace Miniblog.Core.Services
                 post.Comments.Add(comment);
             }
         }
+        #endregion
+
+        #region 不屬於介面方法(輔助)
+        private string GetFilePath(Post post)
+        {
+            return Path.Combine(_folder, post.ID + ".xml");
+        }
 
         private static string ReadValue(XElement doc, XName name, string defaultValue = "")
         {
@@ -352,15 +270,6 @@ namespace Miniblog.Core.Services
                 ? dateTime.ToString(UTC)
                 : dateTime.ToUniversalTime().ToString(UTC);
         }
-
-        protected void SortCache()
-        {
-            _cache.Sort((p1, p2) => p2.PubDate.CompareTo(p1.PubDate));
-        }
-
-        protected bool IsAdmin()
-        {
-            return _contextAccessor.HttpContext?.User?.Identity.IsAuthenticated == true;
-        }
+        #endregion
     }
 }
