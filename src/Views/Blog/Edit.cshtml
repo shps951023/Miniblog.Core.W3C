@@ -1,0 +1,113 @@
+﻿@model Post
+@inject IOptionsSnapshot<BlogSettings> settings
+@{
+    bool isNew = string.IsNullOrEmpty(Model.Title);
+    ViewData["Title"] = "Edit " + (Model.Title ?? "new post");
+    var host = Context.Request.Host.ToString();
+    List<string> allCats = ViewData["AllCats"] as List<string> ?? new List<string>();
+    allCats.Sort();
+}
+
+@section Head{
+    <link rel="stylesheet" href="~/css/admin.scss" />
+    @if (settings.Value.MarkDown)
+    {
+        <link href="~/css/simplemde.min.css" rel="stylesheet" />
+    }
+}
+
+<form method="post" id="edit" class="container" asp-controller="Blog" asp-action="UpdatePost">
+    <div asp-validation-summary="All"></div>
+    <input type="hidden" asp-for="@Model.ID" />
+
+    <label asp-for="@Model.Title" class="label">Title</label>
+    <input asp-for="@Model.Title" required placeholder="Title of blog post" aria-describedby="desc_title" />
+    <span class="desc" id="desc_title">The title as it appears on the website</span>
+    <br />
+
+    <label asp-for="@Model.Slug" class="label">Slug</label>
+    <input asp-for="@Model.Slug" placeholder="The URL name" aria-describedby="desc_slug" />
+    <span class="desc" id="desc_slug">The part of the URL that identifies this blog post</span>
+    <br />
+
+    <label for="categories" class="label">Tags</label>
+    <input type="text" name="selecttag" id="selecttag" aria-describedby="desc_categories" list="taglist" placeholder="@string.Join(", ", Model.Categories)" />
+    <input type="text" name="categories" id="categories" value="@string.Join(", ", Model.Categories)" hidden />
+    <span class="desc" id="desc_categories">Select, or build a comma separated list of keywords - to remove double the keyword</span>
+    <datalist id="taglist">
+        @foreach (var cat in allCats)
+        {
+            <option value="@cat" />
+        }
+    </datalist>
+    <br />
+
+    <label asp-for="@Model.Excerpt" class="label">Excerpt</label>
+    <textarea asp-for="@Model.Excerpt" rows="3" placeholder="Short description of blog post" aria-describedby="desc_excerpt">@Model.Excerpt</textarea>
+    <span class="desc" id="desc_excerpt">A brief description of the content of the post</span>
+    <br />
+
+    <input type="submit" value="Save" title="Save the post" />
+
+    <input asp-for="@Model.IsPublished" />
+    <label asp-for="@Model.IsPublished">Is published</label>
+
+    @if (!isNew)
+    {
+        <input type="submit" value="Delete..." class="delete" title="Delete the post..." asp-action="DeletePost" asp-route-id="@Model.ID" />
+    }
+
+    <hr />
+
+    @if (settings.Value.MarkDown)
+    {
+        @* MarkDown功能 *@
+        <section class="input">
+            <h3 class="main">輸入MarkDown:</h3>
+            <textarea id="markdwonTextArea" asp-for="@Model.MarkDownContent">@Model.MarkDownContent</textarea>
+            <textarea hidden id="markdwonTextAreaHiddenText" asp-for="@Model.Content"></textarea>
+        </section>
+
+        <input asp-for="@Model.IsMarkDown" checked readonly disabled />
+        <label asp-for="@Model.IsMarkDown">Is IsMarkDown</label>
+        <br />
+    }
+    else
+    {
+        <textarea asp-for="@Model.Content" rows="20" aria-label="Content">@Model.Content</textarea>
+    }
+    <input hidden id="toLowerCase" value="@MiniBlogStringExtensions.GetToLowerInvariant()" /> @* 控制標籤是否要大小寫 *@
+</form>
+
+@section Scripts {
+    <script src="//@host/lib/tinymce/tinymce.min.js"></script> @*with enabled CDN tinymce is not able to find some files*@
+    @if (settings.Value.MarkDown)
+    {
+        <script src="~/js/admin.js" async></script>
+        <script src="~/lib/showdown.min.js"></script>
+        <script src="~/lib/simplemde.min.js"></script>
+        <script>
+            //簡單MarkDownEditor
+            var converter = new showdown.Converter({ simpleLineBreaks: true, tables: true });
+            var hiddenMarkDownTextArea = document.getElementById("markdwonTextAreaHiddenText");
+            function reloadMarkDownData() {
+                var markdown = simplemde.value();
+                var html = converter.makeHtml(markdown);
+                hiddenMarkDownTextArea.value = html;
+            }
+            var simplemde = new SimpleMDE({
+                element: document.getElementById("markdwonTextArea"),
+                status: ["autosave", "lines", "words", "cursor", {
+                    className: "CodeMirror-code",
+                    onUpdate: function (el) {
+                        reloadMarkDownData();
+                    }
+                }]
+            });
+        </script>
+    }
+    else
+    {
+        <script src="~/js/admin.js" async></script>
+    }
+}
