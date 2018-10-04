@@ -29,6 +29,10 @@ namespace Miniblog.Core.Models
 
         public bool IsPublished { get; set; } = true;
 
+        public bool IsMarkDown { get; set; } = false;
+
+        public string MarkDownContent { get; set; }
+
         public IList<string> Categories { get; set; } = new List<string>();
 
         public IList<Comment> Comments { get; } = new List<Comment>();

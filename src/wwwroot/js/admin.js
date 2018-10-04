@@ -122,12 +122,13 @@
     // Tag input enhancement - using autocomplete input
     var selecttag = document.getElementById("selecttag");
     var categories = document.getElementById("categories");
+    var toLowerCase = document.getElementById("toLowerCase");
     if (selecttag && categories) {
 
         selecttag.onchange = function () {
 
             var phv = selecttag.placeholder;
-            var val = selecttag.value.toLowerCase();
+            var val = toLowerCase.value === "True" ? selecttag.value.toLowerCase() : selecttag.value;
 
             var phv_array = phv.split(",").map(function (item) {
                 return removeEmpty(item);
