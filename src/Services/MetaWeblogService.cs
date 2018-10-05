@@ -31,7 +31,7 @@ namespace Miniblog.Core.Services
             var newPost = new Models.Post
             {
                 Title = post.title,
-                //TODO:假如mt_excerpt為null，取文章前N個字
+                //Done:假如mt_excerpt為null，取文章前N個字
                 Excerpt= string.IsNullOrWhiteSpace(post.mt_excerpt)? HtmlHelper.HtmlInnerText(post.description): post.mt_excerpt,     
                 Content = post.description,
                 IsPublished = publish,
@@ -78,7 +78,7 @@ namespace Miniblog.Core.Services
                 existing.Content = post.description;
                 existing.IsPublished = publish;
                 existing.Categories = post.categories;
-                //TODO:假如mt_excerpt為null，取文章前N個字
+                //DONE:假如mt_excerpt為null，取文章前N個字
                 existing.Excerpt = string.IsNullOrWhiteSpace(post.mt_excerpt) ? HtmlHelper.HtmlInnerText(post.description) : post.mt_excerpt;  
 
 

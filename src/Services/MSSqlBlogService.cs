@@ -173,7 +173,6 @@ namespace Miniblog.Core.Services
         private void ReloadCacheData()
         {
             LoadPostGroupByCat();
-            //TODO:MarkDown Content
         }
 
         private void LoadPostGroupByCat()
