@@ -22,10 +22,7 @@ namespace Miniblog.Core
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
+        public Startup(IConfiguration configuration) => Configuration = configuration;
 
         public static void Main(string[] args)
         {
