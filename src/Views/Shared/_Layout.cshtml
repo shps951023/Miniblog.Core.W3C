@@ -18,9 +18,13 @@
     <link rel="preload" href="~/js/site.js" as="script" />
     <link rel="preload" href="~/css/belowthefold.scss" as="style" />
     <noscript><link rel="stylesheet" href="~/css/belowthefold.scss" /></noscript>
+    @*<link rel="preload" as="style" href="~/css/w3.css" />
+        <noscript><link rel="stylesheet" href="~/css/w3.css" /></noscript>*@
+    <link rel="stylesheet" href="~/css/w3.css" />
     @RenderSection("Preload", required: false)
+    @*<link rel="stylesheet" href="~/css/w3.css" inline />*@
     <link rel="stylesheet" href="~/css/abovethefold.scss" inline />
-    <link rel="stylesheet" href="~/css/w3.css" inline />
+
 
     <meta property="og:type" content="article" />
     <meta property="og:title" content="@ViewData["Title"]" />
@@ -52,12 +56,12 @@
         <div class="w3-row w3-white w3-padding">
             <div class="w3-half" style="margin:4px 0 6px 0">
                 <a href='/'>
-                    <img src="~/img/logo.gif" alt='logo.gif' style=" width: 280px; height: 32px; "  />
+                    <img src="~/img/logo.gif" alt='logo.gif' style=" width: 280px; height: 32px; " />
                 </a>
             </div>
             <div class="w3-half w3-margin-top w3-wide w3-hide-medium w3-hide-small">
                 <div class="w3-right" style="position:relative;top:5px;">
-                    @manifest.Description
+                    @* 標頭內容 *@
                 </div>
             </div>
         </div>
@@ -109,36 +113,36 @@
         </noscript>
         <!-- Main content: shift it to the right by 270 pixels when the sidebar is visible -->
         <div class="w3-main w3-container" style="margin-left:270px;margin-top:117px;">
+            <main itemprop="mainEntity" itemscope itemtype="http://schema.org/Blog">
 
+                @RenderBody()
+                <footer class="w3-panel w3-padding-32 w3-card-4 w3-light-grey w3-center w3-opacity">
+                    @{
+                        string path = Context.Request.Path;
 
-            @RenderBody()
-            <footer class="w3-panel w3-padding-32 w3-card-4 w3-light-grey w3-center w3-opacity">
-                @{
-                    string path = Context.Request.Path;
-
-                    if (User.Identity.IsAuthenticated)
-                    {
-                        @:【
-                        <a asp-controller="Blog" asp-action="Edit">新建文章</a>
-                        @:/
-                        <a href="~/logout/" title="Sign out as administrator">登出</a>
-                        @:】
-                    }
-                    else
-                    {
-                        if (settings.Value.ShowLogin)
+                        if (User.Identity.IsAuthenticated)
                         {
-                        <a href="~/login/?returnUrl=@path" rel="nofollow" title="Sign in as administrator">【登入】</a>
+                            @:【
+                            <a asp-controller="Blog" asp-action="Edit">新建文章</a>
+                            @:/
+                            <a href="~/logout/" title="Sign out as administrator">登出</a>
+                            @:】
+                        }
+                        else
+                        {
+                            if (settings.Value.ShowLogin)
+                            {
+                                <a href="~/login/?returnUrl=@path" rel="nofollow" title="Sign in as administrator">【登入】</a>
+                            }
                         }
                     }
-                }
-                <p>
-                    Powered by:
-                    <a href="https://github.com/shps951023/W3CMiniblog.Core-W3C">W3CMiniblog.Core.W3C</a>
-                </p>
-                <p>© @DateTime.Now.Year</p>
-            </footer>
-
+                    <p>
+                        Powered by:
+                        <a href="https://github.com/shps951023/W3CMiniblog.Core-W3C">W3CMiniblog.Core.W3C</a>
+                    </p>
+                    <p>© @DateTime.Now.Year</p>
+                </footer>
+            </main>
             <!-- END MAIN -->
         </div>
     </main>

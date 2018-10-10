@@ -91,27 +91,6 @@ namespace Miniblog.Core.Services
 
             return Task.CompletedTask;
         }
-
-        public override async Task<string> SaveFileAsync(byte[] bytes, string fileName, string suffix = null)
-        {
-            suffix = CleanFromInvalidChars(suffix ?? DateTime.UtcNow.Ticks.ToString());
-
-            string ext = Path.GetExtension(fileName);
-            string name = CleanFromInvalidChars(Path.GetFileNameWithoutExtension(fileName));
-
-            string fileNameWithSuffix = $"{name}_{suffix}{ext}";
-
-            string absolute = Path.Combine(_folder, FILES, fileNameWithSuffix);
-            string dir = Path.GetDirectoryName(absolute);
-
-            Directory.CreateDirectory(dir);
-            using (var writer = new FileStream(absolute, FileMode.CreateNew))
-            {
-                await writer.WriteAsync(bytes, 0, bytes.Length).ConfigureAwait(false);
-            }
-
-            return $"/{POSTS}/{FILES}/{fileNameWithSuffix}";
-        }
         #endregion
 
         #region 不屬於介面方法(資料存取)
@@ -209,15 +188,6 @@ namespace Miniblog.Core.Services
         #endregion
 
         #region 不屬於介面方法(輔助)
-        private static string CleanFromInvalidChars(string input)
-        {
-            // ToDo: what we are doing here if we switch the blog from windows
-            // to unix system or vice versa? we should remove all invalid chars for both systems
-
-            var regexSearch = Regex.Escape(new string(Path.GetInvalidFileNameChars()) + new string(Path.GetInvalidPathChars()));
-            var r = new Regex($"[{regexSearch}]");
-            return r.Replace(input, "");
-        }
         #endregion
     }
 }

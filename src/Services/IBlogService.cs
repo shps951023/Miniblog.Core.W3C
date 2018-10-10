@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Miniblog.Core.Models;
@@ -126,12 +128,33 @@ namespace Miniblog.Core.Services
             return Task.FromResult(postsGroup);
         }
 
+        public async Task<string> SaveFileAsync(byte[] bytes, string fileName, string suffix = null)
+        {
+            suffix = CleanFromInvalidChars(suffix ?? DateTime.UtcNow.Ticks.ToString());
+
+            string ext = Path.GetExtension(fileName);
+            string name = CleanFromInvalidChars(Path.GetFileNameWithoutExtension(fileName));
+
+            string fileNameWithSuffix = $"{name}_{suffix}{ext}";
+
+            string absolute = Path.Combine(_folder, FILES, fileNameWithSuffix);
+            string dir = Path.GetDirectoryName(absolute);
+
+            Directory.CreateDirectory(dir);
+            using (var writer = new FileStream(absolute, FileMode.CreateNew))
+            {
+                await writer.WriteAsync(bytes, 0, bytes.Length).ConfigureAwait(false);
+            }
+
+            return $"/{POSTS}/{FILES}/{fileNameWithSuffix}";
+        }
+
+
         public abstract Task SavePost(Post post);
 
         public abstract Task DeletePost(Post post);
 
-        public abstract Task<string> SaveFileAsync(byte[] bytes, string fileName, string suffix = null);
-
+        #region 不屬於介面方法(輔助)
         public void SortCache()
         {
             _cache.Sort((p1, p2) => p2.PubDate.CompareTo(p1.PubDate));
@@ -142,6 +165,23 @@ namespace Miniblog.Core.Services
             return _contextAccessor.HttpContext?.User?.Identity.IsAuthenticated == true;
         }
 
+        private static string CleanFromInvalidChars(string input)
+        {
+            // ToDo: what we are doing here if we switch the blog from windows
+            // to unix system or vice versa? we should remove all invalid chars for both systems
+
+            var regexSearch = Regex.Escape(new string(Path.GetInvalidFileNameChars()) + new string(Path.GetInvalidPathChars()));
+            var r = new Regex($"[{regexSearch}]");
+            return r.Replace(input, "");
+        }
+
+        public async Task<string> UploadImgurImageByBytesAsync(byte[] bytes)
+        {
+            var client = new Imgur.API.Authentication.Impl.ImgurClient("78de6fa5af5d76e", "df7ea5965529602dd8579754b903dd9a0a8ac787");
+            var endpoint = new Imgur.API.Endpoints.Impl.ImageEndpoint(client);
+            return (await endpoint.UploadImageBinaryAsync(bytes)).Link;
+        }
+        #endregion
 
     }
 }

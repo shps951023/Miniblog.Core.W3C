@@ -31,6 +31,7 @@
 
 @section Head {
     <link rel="canonical" href="@(host + Model.GetLink())" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/2.10.0/github-markdown.min.css" rel="stylesheet" />
 }
 <div class="w3-panel w3-padding-large w3-card-4 w3-light-grey">
     <article class="post container" itemscope itemtype="http://schema.org/BlogPosting" itemprop="blogPost">
@@ -42,23 +43,23 @@
                 <a asp-controller="Blog" asp-action="edit" asp-route-id="@Model.ID" title="Edit the post">Edit post</a>
             }
         </header>
-
-        <div itemprop="articleBody mainEntityOfPage" cdnify>
-            @* DONE:改成簡述 *@
-            @if (showFullPost)
-            {
-                @Html.Raw(Model.RenderContent());
-            }
-            else
-            {
-                @Html.Raw(Model.Excerpt);
-                @:...
-            }
-        </div>
-
+        <article class="markdown-body">
+            <div itemprop="articleBody mainEntityOfPage" cdnify>
+                @* DONE:改成簡述 *@
+                @if (showFullPost)
+                {
+                    @Html.Raw(Model.RenderContent());
+                }
+                else
+                {
+                    @Html.Raw(Model.Excerpt);
+                    @:...
+                }
+            </div>
+        </article>
         <footer>
             <time datetime="@Model.PubDate.ToString("s")" itemprop="datePublished">🕛 @Model.PubDate.ToString("MMM d, yyyy")</time>
-            <text>🔖</text>
+            🔖
             @if (Model.Categories.Any())
             {
                 <ul class="categories">
@@ -69,7 +70,7 @@
                 </ul>
             }
 
-            <text>💬</text>
+            💬
             <a href="@Model.GetLink()#comments" itemprop="discussionUrl" title="Go to the comments section">
                 <span itemprop="commentCount">@Model.Comments.Count</span> @(Model.Comments.Count == 1 ? "comment" : "comments")
             </a>
