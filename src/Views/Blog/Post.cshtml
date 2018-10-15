@@ -31,12 +31,15 @@
 
 @section Head {
     <link rel="canonical" href="@(host + Model.GetLink())" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/2.10.0/github-markdown.min.css" rel="stylesheet" />
+    <link href="~/css/github-markdown.min.css" rel="stylesheet" />
 }
 <div class="w3-panel w3-padding-large w3-card-4 w3-light-grey">
     <article class="post container" itemscope itemtype="http://schema.org/BlogPosting" itemprop="blogPost">
         <header>
-            <h1 itemprop="name headline"><a href="@Model.GetLink()" rel="canonical" itemprop="url">@Model.Title</a></h1>
+            @if (!showFullPost || settings.Value.ShowPostTitle)
+            {
+                <h1 itemprop="name headline"><a href="@Model.GetLink()" rel="canonical" itemprop="url">@Model.Title</a></h1>
+            }
             <time datetime="@Model.PubDate.ToString("s")" itemprop="datePublished">Published @Model.PubDate.ToString("MMM d, yyyy")</time>
             @if (User.Identity.IsAuthenticated)
             {

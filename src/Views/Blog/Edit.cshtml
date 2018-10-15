@@ -95,10 +95,10 @@
             //簡單MarkDownEditor
             var hiddenMarkDownTextArea = document.getElementById("markdwonTextAreaHiddenText");
             function reloadMarkDownData() {
-                var testPlain = simplemde.value();
-                var testMarkdown = simplemde.markdown(testPlain);
-                hiddenMarkDownTextArea.value = testMarkdown;
-                console.log(testMarkdown);
+                var plain = simplemde.value();
+                var markdown = simplemde.markdown(plain);
+                hiddenMarkDownTextArea.value = markdown;
+                //console.log(testMarkdown);
             }
             var simplemde = new SimpleMDE({
                 element: document.getElementById("markdwonTextArea"),

@@ -7,5 +7,6 @@
         public int CommentsCloseAfterDays { get; set; } = 10;
         public bool ShowLogin { get; set; } = true;
         public bool MarkDown { get; set; } = false;
+        public bool ShowPostTitle { get; set; } = true;
     }
 }

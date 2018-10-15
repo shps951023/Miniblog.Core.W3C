@@ -1,7 +1,16 @@
 ﻿@import "variables";
 /*====Custom====*/
 * {
-    font-family: "Arial", "Microsoft YaHei", "黑体", "宋体", sans-serif;
+    font-family: "Arial", "Microsoft YaHei", "黑体", "宋体", sans-serif ;
+}
+
+.w3-light-grey, .w3-hover-light-grey:hover, .w3-light-gray, .w3-hover-light-gray:hover {
+    color: #000 !important;
+    background-color: #fff !important
+}
+
+html, body {
+    background: #F2F2F2 !important;
 }
 
 .w3-theme {
