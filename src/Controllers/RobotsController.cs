@@ -33,7 +33,7 @@ namespace Miniblog.Core.Controllers
             string host = Request.Scheme + "://" + Request.Host;
             var sb = new StringBuilder();
             sb.AppendLine("User-agent: *");
-            sb.AppendLine("Disallow:");
+            //sb.AppendLine("Disallow:"); //禁止列入索引連結
             sb.AppendLine($"sitemap: {host}/sitemap.xml");
 
             return sb.ToString();

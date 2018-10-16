@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using WilderMinds.MetaWeblog;
 using Miniblog.Core.Helper;
+using System.Threading.Tasks;
+using Imgur.API.Authentication.Impl;
+using Imgur.API.Endpoints.Impl;
 
 namespace Miniblog.Core.Services
 {
@@ -152,6 +155,7 @@ namespace Miniblog.Core.Services
         {
             ValidateUser(username, password);
             byte[] bytes = Convert.FromBase64String(mediaObject.bits);
+            //string path = UploadImgurImageByBytesAsync(bytes).GetAwaiter().GetResult();
             string path = _blog.SaveFileAsync(bytes, mediaObject.name).GetAwaiter().GetResult();
 
             return new MediaObjectInfo { url = path };

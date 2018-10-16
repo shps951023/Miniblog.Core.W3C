@@ -13,9 +13,9 @@ using System.Transactions;
 
 namespace Miniblog.Core.Services
 {
-    public class MSSqlBlogService : InMemoryBlogServiceBase
+    public class SQLiteBlogService : InMemoryBlogServiceBase
     {
-        public MSSqlBlogService(IHostingEnvironment env, IHttpContextAccessor contextAccessor)
+        public SQLiteBlogService(IHostingEnvironment env, IHttpContextAccessor contextAccessor)
         {
             _folder = Path.Combine(env.WebRootPath, POSTS);
             _contextAccessor = contextAccessor;
@@ -27,10 +27,10 @@ namespace Miniblog.Core.Services
         public override async Task SavePost(Post post)
         {
             post.LastModified = DateTime.UtcNow;
-            using (var conn = SQLHelper.CreateDefaultConnection())
+            using (var conn = SQLiteHelper.CreateDefaultConnection())
             using (var ts = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
-                if (conn.Query<bool>("select top 1 1 from post where id = @id", new { @id = post.ID }).SingleOrDefault())
+                if (conn.Query<bool>("select 1 from post where id = @id", new { @id = post.ID }).SingleOrDefault())
                 {
                     await conn.ExecuteAsync(@"
                         UPDATE Post
@@ -72,7 +72,7 @@ namespace Miniblog.Core.Services
 
         public override Task DeletePost(Post post)
         {
-            using (var conn = SQLHelper.CreateDefaultConnection())
+            using (var conn = SQLiteHelper.CreateDefaultConnection())
             {
                 conn.Execute(@"
                     begin tran;
@@ -80,7 +80,7 @@ namespace Miniblog.Core.Services
                     delete Categories where PostID = @ID;
                     delete Post where ID = @ID;
                     commit;
-                ", new { ID = post.ID });
+                ", new { ID = post.ID }); 
             }
 
             if (_cache.Contains(post))
@@ -97,7 +97,7 @@ namespace Miniblog.Core.Services
 
         public async Task SaveComment(Post post, Comment comment)
         {
-            using (var conn = SQLHelper.CreateDefaultConnection())
+            using (var conn = SQLiteHelper.CreateDefaultConnection())
             {
                 await conn.ExecuteAsync(@"
                     INSERT INTO Comment (ID ,Author ,Email ,Content ,PubDate ,IsAdmin ,PostID) 
@@ -117,7 +117,7 @@ namespace Miniblog.Core.Services
 
         public async Task DeleteComment(Post post, Comment comment)
         {
-            using (var conn = SQLHelper.CreateDefaultConnection())
+            using (var conn = SQLiteHelper.CreateDefaultConnection())
             {
                 await conn.ExecuteAsync(@" Delete Comment where ID = @ID ", new { @ID = comment.ID });
             }
@@ -174,7 +174,7 @@ namespace Miniblog.Core.Services
 
         private void LoadPosts()
         {
-            using (var conn = SQLHelper.CreateDefaultConnection())
+            using (var conn = SQLiteHelper.CreateDefaultConnection())
             {
                 var posts = conn.Query<Post>("select * from Post");
                 foreach (var post in posts)

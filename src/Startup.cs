@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Rewrite;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Miniblog.Core.Helper;
 using Miniblog.Core.Services;
 using WebEssentials.AspNetCore.OutputCaching;
 using WebMarkupMin.AspNetCore2;
@@ -43,9 +44,23 @@ namespace Miniblog.Core
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddSingleton<IUserServices, BlogUserServices>();
+
             //決定使用XML或是SQL讀取資料
-            //services.AddSingleton<IBlogService, MSSqlBlogService>();/*SQL-Server*/
-            services.AddSingleton<IBlogService, FileBlogService>();/*XML*/
+            var section = Configuration.GetSection("blog");
+            if (section.GetValue<string>("SQLiteConnString").Trim() != "")
+            {
+                SQLiteHelper.connectionString = section.GetValue<string>("SQLiteConnString");
+                services.AddSingleton<IBlogService, SQLiteBlogService>();/*SQLite*/
+            }
+            else if (section.GetValue<string>("MSSQLConnString").Trim() != "")
+            {
+                SQLiteHelper.connectionString = section.GetValue<string>("MSSQLConnString");
+                services.AddSingleton<IBlogService, MSSqlBlogService>();/*SQL-Server*/
+            }
+            else
+            {
+                services.AddSingleton<IBlogService, FileBlogService>();/*XML*/
+            }
 
             services.Configure<BlogSettings>(Configuration.GetSection("blog"));
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
