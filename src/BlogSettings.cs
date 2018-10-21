@@ -8,5 +8,7 @@
         public bool ShowLogin { get; set; } = true;
         public bool MarkDown { get; set; } = false;
         public bool ShowPostTitle { get; set; } = true;
+        public string[] ITIronManArticleURI { get; set; }
+        public string ITIronManKeyCode { get; set; }="";
     }
 }

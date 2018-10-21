@@ -62,7 +62,7 @@ namespace Miniblog.Core
                 services.AddSingleton<IBlogService, FileBlogService>();/*XML*/
             }
 
-            services.Configure<BlogSettings>(Configuration.GetSection("blog"));
+            services.Configure<BlogSettings>(section);
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddMetaWeblog<MetaWeblogService>();
 
@@ -114,8 +114,14 @@ namespace Miniblog.Core
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IApplicationLifetime appLifetime)
         {
+            //TODO:IT鐵人賽資料爬蟲讀取
+            var blogservice = app.ApplicationServices.GetService<IBlogService>();
+            var sectionBlog = Configuration.GetSection("blog").Get<BlogSettings>();
+            ITIronManSyncPostService.sectionBlog = sectionBlog;
+            ITIronManSyncPostService.blogService = blogservice;
+
             if (env.IsDevelopment())
             {
                 app.UseBrowserLink();

@@ -39,9 +39,9 @@ namespace Miniblog.Core.Controllers
             {
                 var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme);
                 identity.AddClaim(new Claim(ClaimTypes.Name, model.UserName));
-
+   
                 var principle = new ClaimsPrincipal(identity);
-                var properties = new AuthenticationProperties {IsPersistent = model.RememberMe};
+                var properties = new AuthenticationProperties {IsPersistent = model.RememberMe};/*是否登入記憶*/
                 await HttpContext.SignInAsync(principle, properties);
 
                 return LocalRedirect(returnUrl ?? "/");

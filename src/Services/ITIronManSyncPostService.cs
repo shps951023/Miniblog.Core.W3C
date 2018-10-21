@@ -1,0 +1,129 @@
+﻿using AngleSharp.Parser.Html;
+using Miniblog.Core.Helper;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+
+namespace Miniblog.Core.Services
+{
+    public class ITIronManSyncPostService
+    {
+        private static readonly HtmlParser _parser = new HtmlParser();
+        public IList<Post> Posts { get; set; } = new List<Post>();
+        private string _url { get; set; }
+        public static BlogSettings sectionBlog;
+        public static IBlogService blogService;
+
+        public static void SyncPost()
+        {
+            foreach (var item in sectionBlog.ITIronManArticleURI)
+            {
+                var lstITposts = ITIronManSyncPostService.GetITIronManPosts(item).Result;
+                foreach (var itpost in lstITposts)
+                {
+                    //檢查有沒有資料，如果有資料更新動作
+                    var id = itpost.link.Replace("https://ithelp.ithome.com.tw/articles/", "");
+                    var post = blogService.GetPostById(id).Result;
+                    if (post != null)
+                    {
+                        post.Content = itpost.Content;
+                        post.Excerpt = $"{itpost.link}" + HtmlHelper.HtmlInnerText(itpost.Content);
+                        post.Title = itpost.Title;
+                        post.Categories = new string[] { itpost.Article };
+                    }
+                    //檢查有沒有資料，如果沒有資料做新增動作
+                    else
+                    {                      
+                        post = new Miniblog.Core.Models.Post()
+                        {
+                            ID = id,
+                            Categories = new string[] { itpost.Article },
+                            Content = itpost.Content,
+                            Excerpt = $"{itpost.link}" + HtmlHelper.HtmlInnerText(itpost.Content),
+                            IsMarkDown = true,
+                            PubDate = itpost.PubDate,
+                            Slug = id,
+                            IsPublished = true,
+                            Title = itpost.Title
+                        };
+                    }
+                    blogService.SavePost(post);
+                };
+            }
+        }
+
+        public async static Task<IList<Post>> GetITIronManPosts(string url)
+        {
+            var itironman = new ITIronManSyncPostService();
+            itironman._url = url;
+            await itironman.ExecuteAsync();
+            return itironman.Posts;
+        }
+
+        private async Task ExecuteAsync()
+        {
+            //因為IT鐵人賽只需要三十篇文章，每頁10篇文章，抓取頁數取4頁就好
+            for (int i = 1; i < 4; i++)
+                await GetITIronManPostsAsync(_url + $"?page={i}");
+        }
+
+        private async Task GetITIronManPostsAsync(string url)
+        {
+            var htmlContent = (await GetAsync(url));
+            var document = _parser.Parse(htmlContent);
+
+            //獲取鐵人賽主題
+            var article = document.QuerySelector(".qa-list__title--ironman");
+            article.RemoveChild(article.QuerySelector("span"));/*移除系列文字*/
+            var articleText = article.TextContent.Trim();
+
+            //獲取鐵人賽:發布日期、標題、內容、連結
+            var allpost = document.QuerySelectorAll(".profile-list__content");
+            foreach (var postInfo in allpost)
+            {
+                var post = new Post();
+
+                var titleAndLinkDom = postInfo.QuerySelector(".qa-list__title>a");
+                post.Title = titleAndLinkDom.InnerHtml.Trim();
+                post.link = titleAndLinkDom.GetAttribute("href").Trim();
+                post.Content = GetPostContentAsync(post.link).Result.Trim();
+                post.PubDate = DateTime.Parse(postInfo.QuerySelector(".qa-list__info>.qa-list__info-time").GetAttribute("title").Trim());
+                post.Article = articleText;
+
+                Posts.Add(post);
+            }
+        }
+
+        private async Task<string> GetPostContentAsync(string posturl)
+        {
+            var htmlContent = (await GetAsync(posturl));
+            var document = _parser.Parse(htmlContent);
+            return document.QuerySelectorAll(".markdown__style").FirstOrDefault().InnerHtml;
+        }
+
+        public async Task<string> GetAsync(string uri)
+        {
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
+            request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+
+            using (HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync())
+            using (Stream stream = response.GetResponseStream())
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                return await reader.ReadToEndAsync();
+            }
+        }
+
+        public class Post
+        {
+            public string Title { get; set; }
+            public string link { get; set; }
+            public string Content { get; set; }
+            public string Article { get; set; }
+            public DateTime PubDate { get; set; }
+        }
+    }
+}

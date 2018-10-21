@@ -25,6 +25,15 @@ namespace Miniblog.Core.Controllers
             _manifest = manifest;
         }
 
+        [Route("/api/ITIromManPostSync/")]
+        public IActionResult ITIromManPostSync(string Code)
+        {
+            if (Code == null || Code != _settings.Value.ITIronManKeyCode)
+                return new BadRequestResult();
+            ITIronManSyncPostService.SyncPost();
+            return View("~/Views/Blog/Index.cshtml");
+        }
+
         [Route("/{page:int?}")]
         [OutputCache(Profile = "default")]
         public async Task<IActionResult> Index([FromRoute]int page = 0)

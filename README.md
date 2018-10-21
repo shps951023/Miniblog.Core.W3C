@@ -1,5 +1,5 @@
-﻿輕量高效.NET Core開源Blog引擎Miniblog.Core:介紹
-===
+﻿<!--1.輕量、高效.NET Core開源Blog引擎介紹-->
+
 
 ## Miniblog.Core介紹
 擁有高效又輕量級的Blog引擎，由madskristensen大開源專案[Miniblog.Core](https://github.com/madskristensen/Miniblog.Core)  
@@ -22,6 +22,8 @@
 ![2018-10-05.11.12.18-image.png](https://raw.githubusercontent.com/shps951023/ImageHosting/master/img/2018-10-05.11.12.18-image.png)
 - [完成]支援SQL-Server
 - [完成]支援SQLite
+- [完成]支持Imgur圖床
+- [完成]支援IT鐵人賽文章同步功能
 
 ---
 
@@ -36,10 +38,6 @@ Live demo:  [Miniblog.Core.W3C Live demo](https://miniblogcorew3c.azurewebsites.
 密碼: demo 
 
 ---
-
-## Get Start
-
-[操作方式讀文版](https://itweihan.azurewebsites.net/blog/miniblog_quick_start)
 
 **操作影片:**  
 [![Yes](https://img.youtube.com/vi/4wX9qDPa4q0/0.jpg)](https://www.youtube.com/watch?v=4wX9qDPa4q0)

@@ -14,7 +14,7 @@ namespace Miniblog.Core
         public static string MiniBlogToLowerInvariant(this string content)
         {
             if (toLowerInvariant)
-                return content.MiniBlogToLowerInvariant();
+                return content.ToLowerInvariant();
             else
                 return content;
         }
