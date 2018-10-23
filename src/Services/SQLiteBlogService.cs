@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Transactions;
 
@@ -24,9 +23,13 @@ namespace Miniblog.Core.Services
         }
 
         #region 改寫部分(override)
+
+
+
         public override async Task SavePost(Post post)
         {
             post.LastModified = DateTime.UtcNow;
+            var data = Newtonsoft.Json.JsonConvert.SerializeObject(post);
             using (var conn = SQLiteHelper.CreateDefaultConnection())
             using (var ts = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
@@ -39,13 +42,6 @@ namespace Miniblog.Core.Services
                             ,MarkDownContent = @MarkDownContent,IsMarkDown = @IsMarkDown
                         WHERE ID = @ID
                     ", post);
-                    await conn.ExecuteAsync(@"
-                        Delete Categories where PostID = @ID 
-                    ", post);
-                    var cats = post.Categories.Select(s => new { PostID = post.ID, Name = s }).ToList();
-                    await conn.ExecuteAsync(@"
-                       INSERT INTO Categories (PostID ,Name) VALUES (@PostID ,@Name);
-                    ", cats);
                 }
                 else
                 {
@@ -53,12 +49,19 @@ namespace Miniblog.Core.Services
                         INSERT INTO Post(ID,Title,Slug,Excerpt,Content,PubDate,LastModified,IsPublished,MarkDownContent,IsMarkDown)
                         VALUES (@ID,@Title,@Slug,@Excerpt,@Content,@PubDate,@LastModified,@IsPublished,@MarkDownContent,@IsMarkDown)
                     ", post);
-                    var cats = post.Categories.Select(s => new { PostID = post.ID, Name = s }).ToList();
-                    await conn.ExecuteAsync(@"
-                        INSERT INTO Categories (PostID ,Name) 
-                        VALUES (@PostID ,@Name)
-                    ", cats);
                 }
+                var cats = post.Categories.Select(s => new { PostID = post.ID, Name = s }).ToList();
+
+
+                await conn.ExecuteAsync(@"
+                        Delete from Categories where PostID = @ID ;
+                    ", post);
+
+                await conn.ExecuteAsync(@"
+                    INSERT INTO Categories (PostID ,Name) 
+                    VALUES (@PostID ,@Name)
+                ", cats);
+
                 ts.Complete();
             }
 
@@ -68,6 +71,23 @@ namespace Miniblog.Core.Services
                 SortCache();
             }
             ReloadCacheData();
+        }
+
+        public static async Task InsertCatsAsync(Post post)
+        {
+            using (var conn = SQLiteHelper.CreateDefaultConnection())
+            {
+
+            }
+
+        }
+
+        public static async Task DeleteCatsAsync(Post post)
+        {
+            using (var conn = SQLiteHelper.CreateDefaultConnection())
+            {
+
+            }
         }
 
         public override Task DeletePost(Post post)
@@ -80,7 +100,7 @@ namespace Miniblog.Core.Services
                     delete Categories where PostID = @ID;
                     delete Post where ID = @ID;
                     commit;
-                ", new { ID = post.ID }); 
+                ", new { ID = post.ID });
             }
 
             if (_cache.Contains(post))
