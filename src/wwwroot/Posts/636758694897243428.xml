@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<post>
+  <title>這是測試文章</title>
+  <slug>Test</slug>
+  <pubDate>2018-10-23T05:34:25.166Z</pubDate>
+  <lastModified>2018-10-23T05:34:25.191Z</lastModified>
+  <excerpt>這是測試文章</excerpt>
+  <content>&lt;h1 id="-"&gt;測試文章&lt;/h1&gt;
+&lt;p&gt;圖片功能&lt;br&gt;&lt;img src="https://raw.githubusercontent.com/shps951023/ImageHosting/master/img/2018-10-23.13.32.20-image.png" alt="2018-10-23.13.32.20-image.png"&gt;&lt;/p&gt;
+&lt;p&gt;Code高亮&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;function(){
+    alert(&amp;#39;Hello World!&amp;#39;);
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;引用&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;測試引用&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;單行Code&lt;br&gt;&lt;code&gt;select * from table&lt;/code&gt;&lt;/p&gt;</content>
+  <markDownContent>測試文章
+===
+
+圖片功能
+![2018-10-23.13.32.20-image.png](https://raw.githubusercontent.com/shps951023/ImageHosting/master/img/2018-10-23.13.32.20-image.png)
+
+Code高亮
+```
+function(){
+	alert('Hello World!');
+}
+```
+
+引用
+&gt; 測試引用
+
+單行Code  
+`select * from table`</markDownContent>
+  <isMarkDown>false</isMarkDown>
+  <ispublished>true</ispublished>
+  <categories>
+    <category>Test</category>
+  </categories>
+  <comments></comments>
+</post>
