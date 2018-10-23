@@ -50,13 +50,11 @@ namespace Miniblog.Core.Services
                         VALUES (@ID,@Title,@Slug,@Excerpt,@Content,@PubDate,@LastModified,@IsPublished,@MarkDownContent,@IsMarkDown)
                     ", post);
                 }
-                var cats = post.Categories.Select(s => new { PostID = post.ID, Name = s }).ToList();
-
-
+                
                 await conn.ExecuteAsync(@"
                         Delete from Categories where PostID = @ID ;
                     ", post);
-
+                var cats = post.Categories.Select(s => new { PostID = post.ID, Name = s }).ToList();
                 await conn.ExecuteAsync(@"
                     INSERT INTO Categories (PostID ,Name) 
                     VALUES (@PostID ,@Name)

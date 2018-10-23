@@ -13,7 +13,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\app.db" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="MSSqlCreateTableScript.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\app.db" />
   </ItemGroup>
 
   <ItemGroup>
@@ -34,5 +42,7 @@
     <PackageReference Include="WebMarkupMin.AspNetCore2" Version="2.4.2" />
     <PackageReference Include="WilderMinds.MetaWeblog" Version="1.2.3" />
   </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JSONSchema="" /></VisualStudio></ProjectExtensions>
 
 </Project>

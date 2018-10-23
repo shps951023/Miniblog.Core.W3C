@@ -54,7 +54,7 @@ namespace Miniblog.Core
             }
             else if (section.GetValue<string>("MSSQLConnString").Trim() != "")
             {
-                SQLiteHelper.connectionString = section.GetValue<string>("MSSQLConnString");
+                SQLHelper.connectionString = section.GetValue<string>("MSSQLConnString");
                 services.AddSingleton<IBlogService, MSSqlBlogService>();/*SQL-Server*/
             }
             else

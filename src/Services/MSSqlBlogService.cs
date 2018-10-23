@@ -39,13 +39,6 @@ namespace Miniblog.Core.Services
                             ,MarkDownContent = @MarkDownContent,IsMarkDown = @IsMarkDown
                         WHERE ID = @ID
                     ", post);
-                    await conn.ExecuteAsync(@"
-                        Delete Categories where PostID = @ID 
-                    ", post);
-                    var cats = post.Categories.Select(s => new { PostID = post.ID, Name = s }).ToList();
-                    await conn.ExecuteAsync(@"
-                       INSERT INTO Categories (PostID ,Name) VALUES (@PostID ,@Name);
-                    ", cats);
                 }
                 else
                 {
@@ -53,12 +46,16 @@ namespace Miniblog.Core.Services
                         INSERT INTO Post(ID,Title,Slug,Excerpt,Content,PubDate,LastModified,IsPublished,MarkDownContent,IsMarkDown)
                         VALUES (@ID,@Title,@Slug,@Excerpt,@Content,@PubDate,@LastModified,@IsPublished,@MarkDownContent,@IsMarkDown)
                     ", post);
-                    var cats = post.Categories.Select(s => new { PostID = post.ID, Name = s }).ToList();
-                    await conn.ExecuteAsync(@"
-                        INSERT INTO Categories (PostID ,Name) 
-                        VALUES (@PostID ,@Name)
-                    ", cats);
                 }
+                await conn.ExecuteAsync(@"
+                        Delete from Categories where PostID = @ID ;
+                    ", post);
+                var cats = post.Categories.Select(s => new { PostID = post.ID, Name = s }).ToList();
+                await conn.ExecuteAsync(@"
+                    INSERT INTO Categories (PostID ,Name) 
+                    VALUES (@PostID ,@Name)
+                ", cats);
+
                 ts.Complete();
             }
 
