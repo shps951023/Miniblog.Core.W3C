@@ -17,7 +17,7 @@ namespace Miniblog.Core.Services
         public static BlogSettings sectionBlog;
         public static IBlogService blogService;
 
-        public static void SyncPost()
+        public static async Task SyncPostAsync()
         {
             foreach (var item in sectionBlog.ITIronManArticleURI)
             {
@@ -30,8 +30,13 @@ namespace Miniblog.Core.Services
                     if (post != null)
                     {
                         post.Content = itpost.Content;
-                        post.Excerpt = $"{itpost.link}" + HtmlHelper.HtmlInnerText(itpost.Content);
-                        post.Title = itpost.Title;
+                        post.Excerpt = $"IT鐵人賽連結:<a href='{itpost.link}'>{itpost.link}</a><br/>" + HtmlHelper.HtmlInnerText(itpost.Content);
+                        var title = itpost.Title;
+                        foreach (var replaceString in sectionBlog.ITIronManReplaceString)
+                        {
+                            title = title.Replace(replaceString, "");
+                        }
+                        post.Title = title;
                         post.Categories = new string[] { itpost.Article };
                     }
                     //檢查有沒有資料，如果沒有資料做新增動作
@@ -42,15 +47,20 @@ namespace Miniblog.Core.Services
                             ID = id,
                             Categories = new string[] { itpost.Article },
                             Content = itpost.Content,
-                            Excerpt = $"{itpost.link}" + HtmlHelper.HtmlInnerText(itpost.Content),
                             IsMarkDown = true,
                             PubDate = itpost.PubDate,
                             Slug = id,
-                            IsPublished = true,
-                            Title = itpost.Title
+                            IsPublished = true
                         };
+                        post.Excerpt = $"IT鐵人賽連結:<a href='{itpost.link}'>{itpost.link}</a><br/>" + HtmlHelper.HtmlInnerText(itpost.Content);
+                        var title = itpost.Title;
+                        foreach (var replaceString in sectionBlog.ITIronManReplaceString)
+                        {
+                            title = title.Replace(replaceString, "");
+                        }
+                        post.Title = title;
                     }
-                    blogService.SavePost(post);
+                    await blogService.SavePost(post);
                 };
             }
         }

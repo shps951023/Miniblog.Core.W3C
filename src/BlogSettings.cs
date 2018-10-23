@@ -10,5 +10,6 @@
         public bool ShowPostTitle { get; set; } = true;
         public string[] ITIronManArticleURI { get; set; }
         public string ITIronManKeyCode { get; set; }="";
+        public string[] ITIronManReplaceString { get; set; }
     }
 }

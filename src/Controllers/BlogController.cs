@@ -26,12 +26,12 @@ namespace Miniblog.Core.Controllers
         }
 
         [Route("/api/ITIromManPostSync/")]
-        public IActionResult ITIromManPostSync(string Code)
+        public async Task<IActionResult> ITIromManPostSyncAsync(string Code)
         {
             if (Code == null || Code != _settings.Value.ITIronManKeyCode)
                 return new BadRequestResult();
-            ITIronManSyncPostService.SyncPost();
-            return View("~/Views/Blog/Index.cshtml");
+            await ITIronManSyncPostService.SyncPostAsync();
+            return RedirectToAction("Index");
         }
 
         [Route("/{page:int?}")]
