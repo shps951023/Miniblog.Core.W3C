@@ -27,7 +27,7 @@ namespace Miniblog.Core.Services
         public override async Task SavePost(Post post)
         {
             post.LastModified = DateTime.UtcNow;
-            using (var conn = SQLHelper.CreateDefaultConnection())
+            using (var conn = SqlHelper.CreateDefaultConnection())
             using (var ts = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
                 if (conn.Query<bool>("select top 1 1 from post where id = @id", new { @id = post.ID }).SingleOrDefault())
@@ -69,7 +69,7 @@ namespace Miniblog.Core.Services
 
         public override Task DeletePost(Post post)
         {
-            using (var conn = SQLHelper.CreateDefaultConnection())
+            using (var conn = SqlHelper.CreateDefaultConnection())
             {
                 conn.Execute(@"
                     begin tran;
@@ -94,7 +94,7 @@ namespace Miniblog.Core.Services
 
         public async Task SaveComment(Post post, Comment comment)
         {
-            using (var conn = SQLHelper.CreateDefaultConnection())
+            using (var conn = SqlHelper.CreateDefaultConnection())
             {
                 await conn.ExecuteAsync(@"
                     INSERT INTO Comment (ID ,Author ,Email ,Content ,PubDate ,IsAdmin ,PostID) 
@@ -114,7 +114,7 @@ namespace Miniblog.Core.Services
 
         public async Task DeleteComment(Post post, Comment comment)
         {
-            using (var conn = SQLHelper.CreateDefaultConnection())
+            using (var conn = SqlHelper.CreateDefaultConnection())
             {
                 await conn.ExecuteAsync(@" Delete Comment where ID = @ID ", new { @ID = comment.ID });
             }
@@ -171,7 +171,7 @@ namespace Miniblog.Core.Services
 
         private void LoadPosts()
         {
-            using (var conn = SQLHelper.CreateDefaultConnection())
+            using (var conn = SqlHelper.CreateDefaultConnection())
             {
                 var posts = conn.Query<Post>("select * from Post");
                 foreach (var post in posts)

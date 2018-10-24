@@ -47,14 +47,16 @@ namespace Miniblog.Core
 
             //決定使用XML或是SQL讀取資料
             var section = Configuration.GetSection("blog");
-            if (section.GetValue<string>("SQLiteConnString").Trim() != "")
+            if (section.GetValue<string>("SQLiteConnString")!=null && section.GetValue<string>("SQLiteConnString").Trim() != "")
             {
-                SQLiteHelper.connectionString = section.GetValue<string>("SQLiteConnString");
+                SqlHelper.connectionString = section.GetValue<string>("SQLiteConnString");
+                SqlHelper.dbProviderFactory = System.Data.SQLite.SQLiteFactory.Instance;
                 services.AddSingleton<IBlogService, SQLiteBlogService>();/*SQLite*/
             }
-            else if (section.GetValue<string>("MSSQLConnString").Trim() != "")
+            else if (section.GetValue<string>("MSSQLConnString")!=null && section.GetValue<string>("MSSQLConnString").Trim() != "")
             {
-                SQLHelper.connectionString = section.GetValue<string>("MSSQLConnString");
+                SqlHelper.connectionString = section.GetValue<string>("MSSQLConnString");
+                SqlHelper.dbProviderFactory = System.Data.SqlClient.SqlClientFactory.Instance;
                 services.AddSingleton<IBlogService, MSSqlBlogService>();/*SQL-Server*/
             }
             else
@@ -116,12 +118,13 @@ namespace Miniblog.Core
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, IApplicationLifetime appLifetime)
         {
-            //TODO:IT鐵人賽資料爬蟲讀取
+            //IT鐵人賽資料爬蟲讀取設定
             var blogservice = app.ApplicationServices.GetService<IBlogService>();
             var sectionBlog = Configuration.GetSection("blog").Get<BlogSettings>();
             ITIronManSyncPostService.sectionBlog = sectionBlog;
             ITIronManSyncPostService.blogService = blogservice;
 
+            //
             if (env.IsDevelopment())
             {
                 app.UseBrowserLink();

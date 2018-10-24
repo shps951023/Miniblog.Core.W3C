@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 
 namespace Miniblog.Core.Helper
 {
-    public abstract class SQLHelper
+    public abstract class SqlHelper
     {
-        public static string connectionString ;
-        private static readonly System.Data.Common.DbProviderFactory dbProviderFactory = System.Data.SqlClient.SqlClientFactory.Instance;
+        /*連線字串跟DBPrividerFactory設定在Startup.cs*/
+        public static string connectionString;
+        public static System.Data.Common.DbProviderFactory dbProviderFactory ;
         public static IDbConnection CreateDefaultConnection()
         {
             var conn = dbProviderFactory.CreateConnection();

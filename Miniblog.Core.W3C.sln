@@ -7,6 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Miniblog.Core", "src\Minibl
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E78285B4-DA3B-430D-8E6E-EA02C0FCB8F9}"
 	ProjectSection(SolutionItems) = preProject
+		..\Blogifier\azure-pipelines.yml = ..\Blogifier\azure-pipelines.yml
 		README.md = README.md
 	EndProjectSection
 EndProject
@@ -15,6 +16,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TableSQLScript", "TableSQLS
 		src\Scripts\MSSqlCreateTableScript.sql = src\Scripts\MSSqlCreateTableScript.sql
 		src\Scripts\SQLiteCreateTableScript.sql = src\Scripts\SQLiteCreateTableScript.sql
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{ADE221BB-A7A7-43E7-AC09-A8EAC0F041BF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
