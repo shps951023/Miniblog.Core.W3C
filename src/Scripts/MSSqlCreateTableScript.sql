@@ -1,6 +1,6 @@
 ﻿CREATE TABLE [Post]([ID] [nvarchar](50) NOT NULL
     ,[Title] [nvarchar](250) NOT NULL
-    ,[Slug] [nvarchar](250) NOT NULL,[Excerpt] [nvarchar](250) NOT NULL
+    ,[Slug] [nvarchar](250) NOT NULL,[Excerpt] [nvarchar](max) NOT NULL
     ,[Content] [nvarchar](max) NOT NULL,[PubDate] [datetime] NULL
     ,[LastModified] [datetime] NULL,[IsPublished] [bit] NULL
     ,[IsMarkDown] [bit] NULL,[MarkDownContent] [nvarchar](max) NULL

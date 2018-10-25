@@ -29,7 +29,7 @@ namespace Miniblog.Core.Services
                     var post = blogService.GetPostById(id).Result;
                     if (post != null)
                     {
-                        post.Content = itpost.Content;
+                        post.Content = $"IT鐵人賽連結:<a href='{itpost.link}'>{itpost.link}</a><br/>" + itpost.Content;
                         post.Excerpt = $"IT鐵人賽連結:<a href='{itpost.link}'>{itpost.link}</a><br/>" + HtmlHelper.HtmlInnerText(itpost.Content);
                         var title = itpost.Title;
                         foreach (var replaceString in sectionBlog.ITIronManReplaceString)

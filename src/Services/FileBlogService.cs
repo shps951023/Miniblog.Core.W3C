@@ -6,9 +6,11 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
@@ -31,15 +33,18 @@ namespace Miniblog.Core.Services
             string filePath = GetFilePath(post);
             post.LastModified = DateTime.UtcNow;
 
+            //TODO:如果有資料做更新，沒資料才做新增
+
+            //注意，需要刪除不符合XML的符號
             XDocument doc = new XDocument(
                             new XElement("post",
-                                new XElement("title", post.Title),
+                                new XElement("title", ReplaceHexadecimalSymbols(post.Title)),
                                 new XElement("slug", post.Slug),
                                 new XElement("pubDate", FormatDateTime(post.PubDate)),
                                 new XElement("lastModified", FormatDateTime(post.LastModified)),
-                                new XElement("excerpt", post.Excerpt),
-                                new XElement("content", post.Content),
-                                new XElement("markDownContent", post.MarkDownContent),
+                                new XElement("excerpt", ReplaceHexadecimalSymbols(post.Excerpt)),
+                                new XElement("content", ReplaceHexadecimalSymbols(post.Content)),
+                                new XElement("markDownContent", ReplaceHexadecimalSymbols(post.MarkDownContent)),
                                 new XElement("isMarkDown", post.IsMarkDown),
                                 new XElement("ispublished", post.IsPublished),
                                 new XElement("categories", string.Empty),
@@ -240,6 +245,14 @@ namespace Miniblog.Core.Services
             return dateTime.Kind == DateTimeKind.Utc
                 ? dateTime.ToString(UTC)
                 : dateTime.ToUniversalTime().ToString(UTC);
+        }
+
+        private static string ReplaceHexadecimalSymbols(string txt)
+        {
+            if (txt == null)
+                return null;
+            string r = "[\x00-\x08\x0B\x0C\x0E-\x1F\x26]";
+            return Regex.Replace(txt, r, "", RegexOptions.Compiled);
         }
         #endregion
     }
