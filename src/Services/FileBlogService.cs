@@ -33,8 +33,6 @@ namespace Miniblog.Core.Services
             string filePath = GetFilePath(post);
             post.LastModified = DateTime.UtcNow;
 
-            //TODO:如果有資料做更新，沒資料才做新增
-
             //注意，需要刪除不符合XML的符號
             XDocument doc = new XDocument(
                             new XElement("post",
@@ -76,7 +74,11 @@ namespace Miniblog.Core.Services
                 await doc.SaveAsync(fs, SaveOptions.None, CancellationToken.None).ConfigureAwait(false);
             }
 
-            if (!_cache.Contains(post))
+            /* 如果有資料做更新，沒資料才做新增
+             * 補充:原本寫法: !_cache.Contains(post)，會造成假如是創立新的物件
+             * ，但ID值是一樣的，可以重複新增到Cache
+             */
+            if (!_cache.Any(w=>w.ID == post.ID))
             {
                 _cache.Add(post);
                 SortCache();
