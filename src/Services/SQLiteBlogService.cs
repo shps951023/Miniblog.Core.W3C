@@ -63,7 +63,11 @@ namespace Miniblog.Core.Services
                 ts.Complete();
             }
 
-            if (!_cache.Contains(post))
+            /* 如果有資料做更新，沒資料才做新增
+             * 補充:原本寫法: !_cache.Contains(post)，會造成假如是創立新的物件
+             * ，但ID值是一樣的，可以重複新增到Cache
+             */
+            if (!_cache.Any(w => w.ID == post.ID))
             {
                 _cache.Add(post);
                 SortCache();

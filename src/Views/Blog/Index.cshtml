@@ -21,7 +21,7 @@
                 @(items.Key) <br> (@items.Count() 篇文章)
             </h4>
         </div>
-        @foreach (var post in items.OrderBy(o => o.Title))
+        @foreach (var post in items.OrderBy(o => o.Title, new SemiNumericComparer()))
         {
             <div class="w3-container">
                 <a class="w3-bar-item w3-button" asp-controller="Blog" asp-action="Post"

@@ -118,6 +118,9 @@ namespace Miniblog.Core
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, IApplicationLifetime appLifetime)
         {
+            //標籤、標題是否要轉小寫
+            MiniBlogStringExtensions.SetToLowerInvariant(value: Configuration.GetValue<bool>("toLowerInvariant"));
+
             //IT鐵人賽資料爬蟲讀取設定
             var blogservice = app.ApplicationServices.GetService<IBlogService>();
             var sectionBlog = Configuration.GetSection("blog").Get<BlogSettings>();
@@ -152,8 +155,6 @@ namespace Miniblog.Core
                 app.UseHttpsRedirection();
             }
 
-            //標籤、標題是否要轉小寫
-            MiniBlogStringExtensions.SetToLowerInvariant(value: Configuration.GetValue<bool>("toLowerInvariant"));
 
             app.UseMetaWeblog("/metaweblog");
             app.UseAuthentication();

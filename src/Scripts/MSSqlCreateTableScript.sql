@@ -11,3 +11,15 @@ CREATE TABLE [Comment](  [ID] [nvarchar](50) NOT NULL,  [Author] [nvarchar](50) 
     ,  [Email] [nvarchar](50) NOT NULL,  [Content] [nvarchar](250) NOT NULL,  [PubDate] [datetime] NOT NULL
     ,  [IsAdmin] [bit] NOT NULL,  [PostID] [nvarchar](50) NOT NULL
     , CONSTRAINT [PK_Comment] PRIMARY KEY CLUSTERED (  [ID] ASC));
+
+--Check
+select * from Post with(nolock);
+select * from Categories with(nolock);
+select * from Comment with(nolock);
+--ReInit
+/*
+	delete  Categories;
+	delete  Comment;
+	delete  Post;
+	commit;
+*/

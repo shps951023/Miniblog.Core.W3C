@@ -123,7 +123,7 @@ namespace Miniblog.Core.Services
         {
             bool isAdmin = IsAdmin();
             var postsGroup = _cachePostGroupByCat
-                .Where(w => category == null ? true : w.Key == category)
+                .Where(w => category == null ? true : w.Key == category.MiniBlogToLowerInvariant())
             ;
             return Task.FromResult(postsGroup);
         }
@@ -177,7 +177,8 @@ namespace Miniblog.Core.Services
 
         public async Task<string> UploadImgurImageByBytesAsync(byte[] bytes)
         {
-            var client = new Imgur.API.Authentication.Impl.ImgurClient("78de6fa5af5d76e", "df7ea5965529602dd8579754b903dd9a0a8ac787");
+            //TODO:setting添加Imgur上傳功能。
+            var client = new Imgur.API.Authentication.Impl.ImgurClient("", "");
             var endpoint = new Imgur.API.Endpoints.Impl.ImageEndpoint(client);
             return (await endpoint.UploadImageBinaryAsync(bytes)).Link;
         }

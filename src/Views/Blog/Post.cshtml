@@ -17,7 +17,7 @@
         <div class="w3-container">
             <h4>@ViewBag.MenuTitle</h4>
         </div>
-        foreach (var post in sidebarList.OrderBy(o => o.Title))
+        foreach (var post in sidebarList.OrderBy(o => o.Title, new SemiNumericComparer()))
         {
             <div class="w3-container">
                 <a class="w3-bar-item w3-button" asp-controller="Blog" asp-action="Post"
