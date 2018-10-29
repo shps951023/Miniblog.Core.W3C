@@ -1,24 +1,56 @@
 ﻿using AngleSharp.Parser.Html;
+using Microsoft.Extensions.Hosting;
 using Miniblog.Core.Helper;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Miniblog.Core.Services
 {
+
+    public class ITIronManSyncPostTimedHostedService : IHostedService, IDisposable
+    {
+        private Timer _timer;
+
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            var time = TimeSpan.FromHours(Setting.sectionBlog.ITIronManLocalLoaderInterval);
+            _timer = new Timer(DoWork, null, time, time);
+            return Task.CompletedTask;
+        }
+
+        private void DoWork(object state)
+        {
+            if(ITIronManSyncPostService.SyncPostAsync().GetAwaiter().IsCompleted)
+                throw new Exception("Excute failed");
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            _timer?.Change(Timeout.Infinite, 0);
+            return Task.CompletedTask;
+        }
+
+        public void Dispose()
+        {
+            _timer?.Dispose();
+        }
+    }
+
     public class ITIronManSyncPostService
     {
         private static readonly HtmlParser _parser = new HtmlParser();
         public IList<Post> Posts { get; set; } = new List<Post>();
         private string _url { get; set; }
-        public static BlogSettings sectionBlog;
-        public static IBlogService blogService;
 
         public static async Task SyncPostAsync()
         {
+            var sectionBlog = Setting.sectionBlog;
+            var blogService = Setting.blogService;
             foreach (var item in sectionBlog.ITIronManArticleURI)
             {
                 var lstITposts = ITIronManSyncPostService.GetITIronManPosts(item).Result;
@@ -41,7 +73,7 @@ namespace Miniblog.Core.Services
                     }
                     //檢查有沒有資料，如果沒有資料做新增動作
                     else
-                    {                      
+                    {
                         post = new Miniblog.Core.Models.Post()
                         {
                             ID = id,
@@ -77,7 +109,9 @@ namespace Miniblog.Core.Services
         {
             //因為IT鐵人賽只需要三十篇文章，每頁10篇文章，抓取頁數取4頁就好
             for (int i = 1; i < 4; i++)
+            {
                 await GetITIronManPostsAsync(_url + $"?page={i}");
+            }
         }
 
         private async Task GetITIronManPostsAsync(string url)

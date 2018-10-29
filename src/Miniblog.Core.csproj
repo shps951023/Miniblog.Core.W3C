@@ -17,15 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Remove="wwwroot\app.db" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Remove="MSSqlCreateTableScript.sql" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="wwwroot\app.db" />
   </ItemGroup>
 
   <ItemGroup>

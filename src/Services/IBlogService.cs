@@ -175,13 +175,7 @@ namespace Miniblog.Core.Services
             return r.Replace(input, "");
         }
 
-        public async Task<string> UploadImgurImageByBytesAsync(byte[] bytes)
-        {
-            //TODO:setting添加Imgur上傳功能。
-            var client = new Imgur.API.Authentication.Impl.ImgurClient("", "");
-            var endpoint = new Imgur.API.Endpoints.Impl.ImageEndpoint(client);
-            return (await endpoint.UploadImageBinaryAsync(bytes)).Link;
-        }
+
         #endregion
 
     }

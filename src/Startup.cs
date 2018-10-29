@@ -46,16 +46,17 @@ namespace Miniblog.Core
             services.AddSingleton<IUserServices, BlogUserServices>();
 
             //決定使用XML或是SQL讀取資料
-            var section = Configuration.GetSection("blog");
-            if (section.GetValue<string>("SQLiteConnString")!=null && section.GetValue<string>("SQLiteConnString").Trim() != "")
+            services.Configure<BlogSettings>(Configuration.GetSection("blog"));
+            var section = Configuration.GetSection("blog").Get<BlogSettings>();
+            if (section.SQLiteConnString!=null && section.SQLiteConnString.Trim() != "")
             {
-                SqlHelper.connectionString = section.GetValue<string>("SQLiteConnString");
+                SqlHelper.connectionString = section.SQLiteConnString;
                 SqlHelper.dbProviderFactory = System.Data.SQLite.SQLiteFactory.Instance;
                 services.AddSingleton<IBlogService, SQLiteBlogService>();/*SQLite*/
             }
-            else if (section.GetValue<string>("MSSQLConnString")!=null && section.GetValue<string>("MSSQLConnString").Trim() != "")
+            else if (section.MSSQLConnString!=null && section.MSSQLConnString.Trim() != "")
             {
-                SqlHelper.connectionString = section.GetValue<string>("MSSQLConnString");
+                SqlHelper.connectionString = section.MSSQLConnString;
                 SqlHelper.dbProviderFactory = System.Data.SqlClient.SqlClientFactory.Instance;
                 services.AddSingleton<IBlogService, MSSqlBlogService>();/*SQL-Server*/
             }
@@ -64,7 +65,10 @@ namespace Miniblog.Core
                 services.AddSingleton<IBlogService, FileBlogService>();/*XML*/
             }
 
-            services.Configure<BlogSettings>(section);
+            //是否要開啟IT鐵人賽自動文章同步排程器
+            if (section.UseITIronManLocalLoader)
+                services.AddHostedService<ITIronManSyncPostTimedHostedService>();
+
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddMetaWeblog<MetaWeblogService>();
 
@@ -121,13 +125,12 @@ namespace Miniblog.Core
             //標籤、標題是否要轉小寫
             MiniBlogStringExtensions.SetToLowerInvariant(value: Configuration.GetValue<bool>("toLowerInvariant"));
 
-            //IT鐵人賽資料爬蟲讀取設定
+            //初始化設定
             var blogservice = app.ApplicationServices.GetService<IBlogService>();
             var sectionBlog = Configuration.GetSection("blog").Get<BlogSettings>();
-            ITIronManSyncPostService.sectionBlog = sectionBlog;
-            ITIronManSyncPostService.blogService = blogservice;
+            Setting.sectionBlog = sectionBlog;
+            Setting.blogService = blogservice;
 
-            //
             if (env.IsDevelopment())
             {
                 app.UseBrowserLink();
