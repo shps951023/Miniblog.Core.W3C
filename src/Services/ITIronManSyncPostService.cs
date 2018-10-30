@@ -58,40 +58,18 @@ namespace Miniblog.Core.Services
                 {
                     //檢查有沒有資料，如果有資料更新動作
                     var id = itpost.link.Replace("https://ithelp.ithome.com.tw/articles/", "");
-                    var post = blogService.GetPostById(id).Result;
-                    if (post != null)
-                    {
-                        post.Content = $"IT鐵人賽連結:<a href='{itpost.link}'>{itpost.link}</a><br/>" + itpost.Content;
-                        post.Excerpt = $"IT鐵人賽連結:<a href='{itpost.link}'>{itpost.link}</a><br/>" + HtmlHelper.HtmlInnerText(itpost.Content);
-                        var title = itpost.Title;
-                        foreach (var replaceString in sectionBlog.ITIronManReplaceString)
-                        {
-                            title = title.Replace(replaceString, "");
-                        }
-                        post.Title = title;
-                        post.Categories = new string[] { itpost.Article };
-                    }
-                    //檢查有沒有資料，如果沒有資料做新增動作
-                    else
-                    {
-                        post = new Miniblog.Core.Models.Post()
-                        {
-                            ID = id,
-                            Categories = new string[] { itpost.Article },
-                            Content = itpost.Content,
-                            IsMarkDown = true,
-                            PubDate = itpost.PubDate,
-                            Slug = id,
-                            IsPublished = true
-                        };
-                        post.Excerpt = $"IT鐵人賽連結:<a href='{itpost.link}'>{itpost.link}</a><br/>" + HtmlHelper.HtmlInnerText(itpost.Content);
-                        var title = itpost.Title;
-                        foreach (var replaceString in sectionBlog.ITIronManReplaceString)
-                        {
-                            title = title.Replace(replaceString, "");
-                        }
-                        post.Title = title;
-                    }
+                    var post = blogService.GetPostById(id).Result?? new Miniblog.Core.Models.Post() { ID = id };
+                    post.Content = $"IT鐵人賽連結:<a href='{itpost.link}'>{itpost.link}</a><hr/>" + itpost.Content;
+                    post.Excerpt = $"IT鐵人賽連結:<a href='{itpost.link}'>{itpost.link}</a><hr/>" + HtmlHelper.HtmlInnerText(itpost.Content);
+                    var title = itpost.Title;
+                    foreach (var replaceString in sectionBlog.ITIronManReplaceString)
+                        title = title.Replace(replaceString, "");
+                    post.Title = title;
+                    post.Categories = new string[] { itpost.Article };
+                    post.IsPublished = true;
+                    post.IsMarkDown = true;
+                    post.PubDate = itpost.PubDate;
+                    post.Slug = id;
                     await blogService.SavePost(post);
                 };
             }
