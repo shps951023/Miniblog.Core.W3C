@@ -25,7 +25,7 @@ namespace Miniblog.Core.Services
 
         private void DoWork(object state)
         {
-            if(ITIronManSyncPostService.SyncPostAsync().GetAwaiter().IsCompleted)
+            if(!ITIronManSyncPostService.SyncPostAsync().GetAwaiter().IsCompleted)
                 throw new Exception("Excute failed");
         }
 
